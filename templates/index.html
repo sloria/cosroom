@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Get A Room</title>
+    <!-- <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure&#45;min.css" integrity="sha384&#45;nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"> -->
+    <script src="https://unpkg.com/vue@2.4.4/dist/vue.js"></script>
+    <script src="{{url_for('static', filename='vendor/date-fns/date_fns.js')}}"></script>
+    <script src="{{url_for('static', filename='index.js')}}"></script>
+  </head>
+  <body>
+    {% raw %}
+    <div id="app">
+
+      <div v-if="!free.length && !busy.length">
+        Loading...
+      </div>
+
+      <div v-if="free.length">
+        <h2>{{ free[0].name }} is available.</h2>
+        <p v-if="free.length > 1">The following rooms are also available:</p>
+        <ul>
+          <li v-for="room in free.slice(1)">
+            {{ room.name }}
+            <span v-if="room.until">is available for {{ distance(room.until) }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <div v-if="busy.length">
+        <p>The following rooms are not yet available:</p>
+        <ul>
+          <li v-for="room in busy">
+            {{ room.name }}
+            <span v-if="room.until">(available in {{ distance(room.until) }})</span>
+          </li>
+        </ul>
+      </div>
+
+      <a href="/logout">Log out</a>
+      <!-- FOR DEBUGGING -->
+      <!-- <pre>Debugging:</pre> -->
+      <!-- <pre>{{ JSON.stringify({ free, busy }, null, 2) }}</pre> -->
+    </div>
+    {% endraw %}
+  </body>
+</html>

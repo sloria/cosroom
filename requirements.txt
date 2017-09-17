@@ -1,0 +1,8 @@
+environs==1.2.0
+flask==0.12.2
+google-api-python-client==1.6.3
+python-dateutil==2.6.1
+pytz==2017.2
+
+# Deployment
+gunicorn>=19.1.1
