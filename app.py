@@ -1,5 +1,5 @@
 #!/usr/bin/python2.7
-# -*- coding: utf-8 -*-
+import os
 from collections import namedtuple
 import datetime as dt
 
@@ -18,7 +18,8 @@ from oauth2client.client import OAuth2WebServerFlow
 
 env = environs.Env()
 # Read .env file
-env.read_env()
+if os.path.isfile('.env'):
+    env.read_env()
 CLIENT_ID = env.str('CLIENT_ID', required=True)
 CLIENT_SECRET = env.str('CLIENT_SECRET', required=True)
 SECRET_KEY = env.str('SECRET_KEY', required=True)
