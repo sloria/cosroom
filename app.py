@@ -36,7 +36,8 @@ flow = OAuth2WebServerFlow(
 RoomStates = namedtuple('RoomStates', ['free', 'busy'])
 
 app = Flask(__name__)
-
+app.secret_key = SECRET_KEY
+app.debug = DEBUG
 
 def get_calendars(service):
     return [
@@ -143,6 +144,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.secret_key = SECRET_KEY
-    app.debug = DEBUG
     app.run(host='0.0.0.0')
