@@ -54,30 +54,44 @@ def oauth2callback():
             credentials = flow.step2_exchange(code)
         except Exception as e:
             abort(400)
-        # TODO: Store in a db or something
         session['credentials'] = credentials.to_json()
 
     return redirect(url_for('index'))
 
-@app.route('/api/')
-def api():
-    try:
-        credentials = client.Credentials.new_from_json(session['credentials'])
-    except KeyError:
-        abort(401)
-
+def get_service(error=False):
+    if not session.get('credentials'):
+        if error:
+            abort(401)
+        else:
+            return False
+    credentials = client.Credentials.new_from_json(session['credentials'])
     http = httplib2.Http()
     http = credentials.authorize(http)
     service = build('calendar', 'v3', http=http)
+    return service
+
+@app.route('/api/')
+def api():
+    service = get_service(error=True)
     free, busy = get_free_and_busy_rooms(service)
     return jsonify({
         'free': free,
         'busy': busy,
     })
 
+def check_service(service):
+    if not service:
+        return False
+    try:
+        service.calendarList().list().execute()
+    except Exception:
+        return False
+    return True
+
 @app.route('/')
 def index():
-    if not session.get('credentials'):
+    service = get_service(error=False)
+    if not service or not check_service(service):
         return redirect(url_for('login'))
     return render_template('index.html')
 
