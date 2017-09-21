@@ -104,3 +104,4 @@ venv.bak/
 # mypy
 .mypy_cache/
 client_secret.json
+README.html

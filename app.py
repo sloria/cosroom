@@ -1,147 +1,151 @@
-#!/usr/bin/python2.7
+"""Menu bar app to find an open room at COS."""
 import os
-from collections import namedtuple
-import datetime as dt
+import webbrowser
 
-import pytz
-from dateutil.parser import parse
 import environs
 import httplib2
-from flask import (
-    Flask, abort, jsonify, redirect, request,
-    session, url_for, render_template,
-)
+import maya
 
-from apiclient.discovery import build
-from oauth2client import client
-from oauth2client.client import OAuth2WebServerFlow
+import rumps
+from apiclient import discovery
+from oauth2client import client, tools
+from oauth2client.file import Storage
+
+from findroom import get_free_and_busy_rooms
+
+try:
+    import argparse
+    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
+except ImportError:
+    flags = None
 
 env = environs.Env()
-# Read .env file
-if os.path.isfile('.env'):
+if os.path.exists('.env'):
     env.read_env()
-CLIENT_ID = env.str('CLIENT_ID', required=True)
-CLIENT_SECRET = env.str('CLIENT_SECRET', required=True)
-SECRET_KEY = env.str('SECRET_KEY', required=True)
-REDIRECT_URI = env.str('REDIRECT_URI', required=True)
-DEBUG = env.bool('DEBUG', default=False)
 
-flow = OAuth2WebServerFlow(
-    client_id=CLIENT_ID,
-    client_secret=CLIENT_SECRET,
-    scope='https://www.googleapis.com/auth/calendar.readonly',
-    redirect_uri=REDIRECT_URI,
-)
+DEBUG = env.bool('RUMPS_DEBUG', default=False)
+CLIENT_SECRET_FILE = env.str('CLIENT_SECRET_FILE', required=True)
 
-RoomStates = namedtuple('RoomStates', ['free', 'busy'])
+SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
+UPDATE_INTERVAL = env.int('FINDROOM_INTERVAL', default=20)
 
-app = Flask(__name__)
-app.secret_key = SECRET_KEY
-app.debug = DEBUG
-
-def get_calendars(service):
-    return [
-        calendar for calendar in service.calendarList().list().execute()['items']
-        if calendar['accessRole'] == 'freeBusyReader'
-    ]
-
-# TODO: Sort free and busy rooms by availability time
-def get_free_and_busy_rooms(service):
-    calendars = get_calendars(service)
-    room_ids = {
-        each['id']: each['summary']
-        for each in calendars
-    }
-    timemin = dt.datetime.utcnow().replace(tzinfo=pytz.utc)
-    timemax = (dt.datetime.utcnow() + dt.timedelta(hours=24)).replace(tzinfo=pytz.utc)
-
-    free = []
-    busy = []
-    freebusy = service.freebusy().query(body={
-        'timeMin': timemin.isoformat(),
-        'timeMax': timemax.isoformat(),
-        'items': calendars,
-    }).execute()
-    now = dt.datetime.utcnow().replace(tzinfo=pytz.utc)
-    for calendar_id in freebusy['calendars']:
-        room_name = room_ids[calendar_id]
-        data = freebusy['calendars'][calendar_id]
-        if data['busy']:
-            next_busy = data['busy'][0]
-            start = parse(next_busy['start'])
-            if (start - now).total_seconds() < 5 * 60:
-                busy.append({
-                    'id': calendar_id,
-                    'name': room_name,
-                    'until': next_busy['end']
-                })
-            else:
-                free.append({
-                    'id': calendar_id,
-                    'name': room_name,
-                    'until': next_busy['start']
-                })
-        else:
-            free.append({
-                'id': calendar_id,
-                'name': room_name,
-            })
-    return RoomStates(free, busy)
+home_dir = os.path.expanduser('~')
+credential_dir = os.path.join(home_dir, '.credentials')
+credential_path = os.path.join(credential_dir, 'findroom.json')
 
 
-@app.route('/login')
-def login():
-    auth_uri = flow.step1_get_authorize_url()
-    return redirect(auth_uri)
+def get_credentials():
+    """Gets valid user credentials from storage.
 
-@app.route('/signout')
-def signout():
-    del session['credentials']
-    session['message'] = "You have logged out"
+    If nothing has been stored, or if the stored credentials are invalid,
+    the OAuth2 flow is completed to obtain the new credentials.
 
-    return redirect(url_for('index'))
+    Returns:
+        Credentials, the obtained credential.
+    """
+    if not os.path.exists(credential_dir):
+        os.makedirs(credential_dir)
+    store = Storage(credential_path)
+    credentials = store.get()
+    if not credentials or credentials.invalid:
+        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+        flow.user_agent = 'Find Room'
+        if flags:
+            credentials = tools.run_flow(flow, store, flags)
+        else:  # Needed only for compatibility with Python 2.6
+            credentials = tools.run(flow, store)
+        print('Storing credentials to ' + credential_path)
+    return credentials
 
-@app.route('/callback')
-def oauth2callback():
-    code = request.args.get('code')
-    if code:
-        flow.redirect_uri = request.base_url
+def has_credentials():
+    if not os.path.exists(credential_dir):
+        return False
+    store = Storage(credential_path)
+    credentials = store.get()
+    return credentials and not credentials.invalid
+
+def get_service():
+    credentials = get_credentials()
+    http = credentials.authorize(httplib2.Http())
+    service = discovery.build('calendar', 'v3', http=http)
+    return service
+
+def to_menu_item(data, free=False):
+    name = data['name']
+    if data.get('until'):
+        until_slang = maya.parse(data['until']).slang_time()
+        if until_slang.endswith(' from now'):
+            until_slang = until_slang[:-len(' from now')]
+        pre = 'free in ' if not free else ''
+        suffix = ' ({pre}{until})'.format(pre=pre, until=until_slang)
+    else:
+        suffix = ''
+    title = '{}{}'.format(name, suffix)
+
+    if 'create_url' in data:
+        def callback(_):
+            webbrowser.open_new_tab(data['create_url'])
+    else:
+        callback = None
+    return rumps.MenuItem(title, callback=callback)
+
+
+class App(rumps.App):
+
+    def __init__(self):
+        self.service = None
+        self.has_creds = has_credentials()
+        if self.has_creds:
+            self.service = get_service()
+        super(App, self).__init__('R', menu=self.get_menu(), quit_button=None)
+
+    def login(self, sender):
+        self.service = get_service()
+        self.has_creds = has_credentials()
+
+    def logout(self, sender):
         try:
-            credentials = flow.step2_exchange(code)
-        except Exception as e:
-            abort(400)
-        # TODO: Store in a db or something
-        session['credentials'] = credentials.to_json()
+            os.remove(credential_path)
+        except (OSError, IOError):
+            pass
+        self.has_creds = False
+        self.menu.clear()
+        self.menu = self.get_menu()
 
-    return redirect(url_for('index'))
+    def get_menu(self):
+        quit = rumps.MenuItem('Quit', callback=rumps.quit_application)
+        if self.has_creds:
+            free, busy = get_free_and_busy_rooms(self.service)
+            phone_booths = []
+            for each in list(free):
+                if each['name'].startswith('Phone Booth'):
+                    phone_booths.append(each)
+                    free.remove(each)
+            menu = [to_menu_item(each, free=True) for each in free]
+            if phone_booths:
+                menu.append({'Phone Booths': [to_menu_item(each, free=True)
+                                              for each in phone_booths]})
+            if busy:
+                menu.append({'Busy': [to_menu_item(each, free=False) for each in busy]})
+            logout = rumps.MenuItem('Log out', callback=self.logout)
+            menu.extend([
+                None,
+                logout,
+                None,
+                quit,
+            ])
+        else:
+            login = rumps.MenuItem('Log in', callback=self.login)
+            menu = [login, quit]
+        return menu
 
-@app.route('/api/')
-def api():
-    try:
-        credentials = client.Credentials.new_from_json(session['credentials'])
-    except KeyError:
-        abort(401)
+    @rumps.timer(UPDATE_INTERVAL)
+    def update_menu(self, sender):
+        self.menu.clear()
+        self.menu = self.get_menu()
 
-    http = httplib2.Http()
-    http = credentials.authorize(http)
-    service = build('calendar', 'v3', http=http)
-    free, busy = get_free_and_busy_rooms(service)
-    return jsonify({
-        'free': free,
-        'busy': busy,
-    })
-
-@app.route('/')
-def index():
-    if not session.get('credentials'):
-        return redirect(url_for('login'))
-    return render_template('index.html')
-
-@app.route('/logout')
-def logout():
-    session['credentials'] = None
-    return render_template('logout.html')
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+def main():
+    rumps.debug_mode(DEBUG)
+    app = App()
+    app.icon = 'icon.png'
+    app.run()
