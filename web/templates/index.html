@@ -18,12 +18,18 @@
       </div>
 
       <div v-if="free.length">
-        <h2>{{ free[0].name }} is available.</h2>
+        <h2>{{ free[0].name }} is available
+          <span v-if="free[0].until">for {{ distance(free[0].until) }}</span>
+        </h2>
+        <div v-if="free[0].create_url">
+          <a v-bind:href="free[0].create_url">[Reserve now]</a>
+        </div>
         <p v-if="free.length > 1">The following rooms are also available:</p>
         <ul>
           <li v-for="room in free.slice(1)">
             {{ room.name }}
             <span v-if="room.until">is available for {{ distance(room.until) }}</span>
+            <a v-bind:href="room.create_url" v-if="room.create_url">[Reserve now]</a>
           </li>
         </ul>
       </div>
@@ -33,7 +39,10 @@
         <ul>
           <li v-for="room in busy">
             {{ room.name }}
-            <span v-if="room.until">(available in {{ distance(room.until) }})</span>
+            <span v-if="room.until">
+              (available in {{ distance(room.until) }})
+              <a v-bind:href="room.create_url" v-if="room.create_url">[Reserve next opening]</a>
+            </span>
           </li>
         </ul>
       </div>
