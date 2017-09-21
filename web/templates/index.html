@@ -3,15 +3,15 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Get A Room</title>
-    <!-- <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure&#45;min.css" integrity="sha384&#45;nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous"> -->
+    <title>Find a room at COS</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='app.css')}}">
     <script src="https://unpkg.com/vue@2.4.4/dist/vue.js"></script>
     <script src="{{url_for('static', filename='vendor/date-fns/date_fns.js')}}"></script>
     <script src="{{url_for('static', filename='index.js')}}"></script>
   </head>
   <body>
     {% raw %}
-    <div id="app">
+    <div class="container" id="app">
 
       <div v-if="!free.length && !busy.length">
         Loading...
@@ -22,14 +22,14 @@
           <span v-if="free[0].until">for {{ distance(free[0].until) }}</span>
         </h2>
         <div v-if="free[0].create_url">
-          <a v-bind:href="free[0].create_url">[Reserve now]</a>
+          <a class="btn" v-bind:href="free[0].create_url">Reserve now</a>
         </div>
         <p v-if="free.length > 1">The following rooms are also available:</p>
         <ul>
           <li v-for="room in free.slice(1)">
-            {{ room.name }}
+            <strong>{{ room.name }}</strong>
             <span v-if="room.until">is available for {{ distance(room.until) }}</span>
-            <a v-bind:href="room.create_url" v-if="room.create_url">[Reserve now]</a>
+            <a class="btn"  v-bind:href="room.create_url" v-if="room.create_url">Reserve now</a>
           </li>
         </ul>
       </div>
@@ -38,10 +38,10 @@
         <p>The following rooms are not yet available:</p>
         <ul>
           <li v-for="room in busy">
-            {{ room.name }}
+            <strong>{{ room.name }}</strong>
             <span v-if="room.until">
               (available in {{ distance(room.until) }})
-              <a v-bind:href="room.create_url" v-if="room.create_url">[Reserve next opening]</a>
+              <a class="btn"  v-bind:href="room.create_url" v-if="room.create_url">Reserve next opening</a>
             </span>
           </li>
         </ul>

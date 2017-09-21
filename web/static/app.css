@@ -1,0 +1,30 @@
+body {
+  font-family: 'Liberation Serif', 'Georgia', serif;
+  font-size: 1.1em;
+  line-height: 1.5;
+}
+
+.container {
+    width: 700px;
+    margin: 20px auto;
+}
+
+a {
+  color: #007ea7;
+}
+a:hover {
+  background-color: #a9f8fb;
+}
+
+.btn {
+  font-family: monospace;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.btn::before {
+  content: '[';
+}
+
+.btn::after {
+  content: ']';
+}
