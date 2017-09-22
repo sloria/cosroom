@@ -17,31 +17,31 @@
         Loading...
       </div>
 
-      <div v-if="free.length">
-        <h2>{{ free[0].name }} is available
-          <span v-if="free[0].until">for {{ distance(free[0].until) }}</span>
+      <div v-if="featured || free.length">
+        <h2>{{ featured.name }} is available
+          <span v-if="featured.until">for {{ distance(featured.until) }}</span>
         </h2>
-        <div v-if="free[0].create_url">
-          <a class="btn" v-bind:href="free[0].create_url">Reserve now</a>
+        <div v-if="featured.createURL">
+          <a class="btn" v-bind:href="featured.createURL">Reserve now</a>
         </div>
-        <p v-if="free.length > 1">The following rooms are also available:</p>
-        <ul>
-          <li v-for="room in free.slice(1)">
+        <p v-if="free.length">The following rooms are also available:</p>
+        <ul class="free-room-list">
+          <li v-for="room in free">
             <strong>{{ room.name }}</strong>
             <span v-if="room.until">is available for {{ distance(room.until) }}</span>
-            <a class="btn"  v-bind:href="room.create_url" v-if="room.create_url">Reserve now</a>
+            <a class="btn" v-bind:href="room.createURL" v-if="room.createURL">Reserve now</a>
           </li>
         </ul>
       </div>
 
       <div v-if="busy.length">
         <p>The following rooms are not yet available:</p>
-        <ul>
+        <ul class="busy-room-list">
           <li v-for="room in busy">
             <strong>{{ room.name }}</strong>
             <span v-if="room.until">
               (available in {{ distance(room.until) }})
-              <a class="btn"  v-bind:href="room.create_url" v-if="room.create_url">Reserve next opening</a>
+              <a class="btn" v-bind:href="room.createURL" v-if="room.createURL">Reserve next opening</a>
             </span>
           </li>
         </ul>
