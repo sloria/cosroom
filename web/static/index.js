@@ -13,12 +13,20 @@ function fetchJSON(...args) {
   return fetch(...args).then(checkStatus).then(parseJSON);
 }
 
+const images = {
+  Aberto: '/static/images/aberto.jpg',
+  Bukas: '/static/images/bukas.jpg',
+  Offnen: '/static/images/offnen.jpg',
+  Aperi: '/static/images/aperi.jpg',
+  Furan: '/static/images/furan.jpg',
+}
+
 function Room(data) {
   this.createURL = data.create_url;
   this.name = data.name;
   this.id = data.id;
   this.until = data.until;
-  // TODO: image
+  this.image = images[data.name];
 }
 
 function randomChoice(ary) {
@@ -32,24 +40,40 @@ document.addEventListener('DOMContentLoaded', () => {
       free: [],
       busy: [],
       featured: null,
+      loaded: false,
+      lastUpdated: null,
     },
     mounted() {
-      fetchJSON('/api/', { credentials: 'include' })
-        .then((json) => {
-          if (json.free.length) {
-            // Choose a random room that is not a phone booth
-            this.featured = new Room(randomChoice(
-              json.free.filter((each) => !each.name.startsWith('Phone Booth'))
-            ));
-          }
-          // More free rooms
-          const moreFree = this.featured ? json.free.filter((each) => each.name !== this.featured.name) : json.free;
-          this.free = moreFree.map((each) => new Room(each));
-          this.busy = json.busy.map((each) => new Room(each));
-        });
+      this.update();
+    },
+    computed: {
+      featuredStyle: function() {
+        return {
+          width: '797px',
+          height: '448px',
+          'background-image':'url("' + this.featured.image + '")',
+        }
+      }
     },
     methods: {
       distance: dateFns.distanceInWordsToNow,
+      update: function() {
+        fetchJSON('/api/', { credentials: 'include' })
+          .then((json) => {
+            if (json.free.length) {
+              // Choose a random room that is not a phone booth
+              this.featured = new Room(randomChoice(
+                json.free.filter((each) => !each.name.startsWith('Phone Booth'))
+              ));
+            }
+            // More free rooms
+            const moreFree = this.featured ? json.free.filter((each) => each.name !== this.featured.name) : json.free;
+            this.free = moreFree.map((each) => new Room(each));
+            this.busy = json.busy.map((each) => new Room(each));
+            this.lastUpdated = new Date();
+            this.loaded = true;
+          });
+      }
     },
   });
 });

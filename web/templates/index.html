@@ -13,44 +13,64 @@
     {% raw %}
     <div class="container" id="app">
 
-      <div v-if="!free.length && !busy.length">
-        Loading...
-      </div>
+      <header v-if="loaded">
+        <nav>
+          <ul>
+            <li><a class="btn" href="/logout">Log out</a></li>
+          </ul>
+        </nav>
+      </header>
 
-      <div v-if="featured || free.length">
-        <h2>{{ featured.name }} is available
-          <span v-if="featured.until">for {{ distance(featured.until) }}</span>
-        </h2>
-        <div v-if="featured.createURL">
-          <a class="btn" v-bind:href="featured.createURL">Reserve now</a>
+
+      <div class="content">
+
+        <div v-if="!loaded">
+          Finding a room...
         </div>
-        <p v-if="free.length">The following rooms are also available:</p>
-        <ul class="free-room-list">
-          <li v-for="room in free">
-            <strong>{{ room.name }}</strong>
-            <span v-if="room.until">is available for {{ distance(room.until) }}</span>
-            <a class="btn" v-bind:href="room.createURL" v-if="room.createURL">Reserve now</a>
-          </li>
-        </ul>
-      </div>
 
-      <div v-if="busy.length">
-        <p>The following rooms are not yet available:</p>
-        <ul class="busy-room-list">
-          <li v-for="room in busy">
-            <strong>{{ room.name }}</strong>
-            <span v-if="room.until">
-              (available in {{ distance(room.until) }})
-              <a class="btn" v-bind:href="room.createURL" v-if="room.createURL">Reserve next opening</a>
-            </span>
-          </li>
-        </ul>
-      </div>
+        <div v-if="featured || free.length">
+          <!-- <img v&#45;if="featured.image" v&#45;bind:src="featured.image" v&#45;bind:alt="featured.name" /> -->
+          <div class="featured-image" v-bind:style="featuredStyle">
+            <h2 class="featured">{{ featured.name }} is available
+              <span v-if="featured.until">for {{ distance(featured.until) }}</span>
+            </h2>
+          </div>
+          <div v-if="featured.createURL">
+            <a class="btn" v-bind:href="featured.createURL">Reserve now</a>
+          </div>
 
-      <a href="/logout">Log out</a>
+
+
+          <p v-if="free.length">The following rooms are also available:</p>
+          <ul class="free-room-list">
+            <li v-for="room in free">
+              <strong>{{ room.name }}</strong>
+              <span v-if="room.until">is available for {{ distance(room.until) }}</span>
+              <a class="btn" v-bind:href="room.createURL" v-if="room.createURL">Reserve now</a>
+            </li>
+          </ul>
+        </div>
+
+        <div v-if="busy.length">
+          <p>The following rooms are not yet available:</p>
+          <ul class="busy-room-list">
+            <li v-for="room in busy">
+              <strong>{{ room.name }}</strong>
+              <span v-if="room.until">
+                (available in {{ distance(room.until) }})
+                <a class="btn" v-bind:href="room.createURL" v-if="room.createURL">Reserve next opening</a>
+              </span>
+            </li>
+          </ul>
+        </div>
+
+      <small v-if="lastUpdated">Last updated {{ lastUpdated.toLocaleString() }}</small>
+
       <!-- FOR DEBUGGING -->
       <!-- <pre>Debugging:</pre> -->
       <!-- <pre>{{ JSON.stringify({ free, busy }, null, 2) }}</pre> -->
+
+      </div><!-- /.content -->
     </div>
     {% endraw %}
   </body>

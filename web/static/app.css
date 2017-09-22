@@ -4,13 +4,15 @@ body {
   line-height: 1.5;
 }
 
-.container {
-    width: 700px;
-    margin: 20px auto;
+div.content {
+  width: 797px;
+  max-width: 90%;
+  margin: 20px auto;
 }
 
 a {
   color: #007ea7;
+  transition: .3s background-color;
 }
 a:hover {
   background-color: #a9f8fb;
@@ -27,4 +29,36 @@ a:hover {
 
 .btn::after {
   content: ']';
+}
+
+.featured-image {
+  max-width: 100% !important;
+  height: auto;
+}
+
+.featured {
+  position: relative;
+  top: 350px;
+  background: rgba(0, 0, 0, 0.75);
+  padding: 4px 8px;
+  color: white;
+  margin: 0;
+  font-size: 2.2em;
+  /* margin-bottom: 0px; */
+}
+
+@media (max-width: 700px) {
+  .featured {
+    font-size: 5.2vw;
+  }
+}
+
+nav ul {
+  list-style: none;
+  padding: 10px 20px;
+  margin: 0;
+}
+
+nav ul li {
+  float: right;
 }
