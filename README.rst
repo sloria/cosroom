@@ -1,6 +1,6 @@
-********
-findroom
-********
+*******
+cosroom
+*******
 
 Find an open room at COS using the Google Calendar API. This project
 includes both a **web app** and a **macOS menu bar app**.
@@ -15,7 +15,7 @@ Install requirements
 --------------------
 ::
 
-  pip install findroom[app]
+  pip install cosroom[app]
 
 Obtaining a client_secret.json file
 -----------------------------------
@@ -41,7 +41,7 @@ To run the native menu bar app:
 
 ::
 
-  CLIENT_SECRET_FILE=client_secret.json findroom
+  CLIENT_SECRET_FILE=client_secret.json cosroom
 
 
 Running the web app
@@ -51,7 +51,7 @@ Install requirements
 --------------------
 ::
 
-  pip install findroom[web]
+  pip install cosroom[web]
 
 
 Define configuration

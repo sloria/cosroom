@@ -8,7 +8,7 @@ from flask import (Flask, abort, jsonify, redirect, render_template, request,
                    session, url_for)
 
 from apiclient.discovery import build
-from findroom import get_free_and_busy_rooms
+from cosroom import get_free_and_busy_rooms
 from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
 

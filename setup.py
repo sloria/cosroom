@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 from setuptools import setup
 
 REQUIREMENTS = [
@@ -21,15 +20,15 @@ def read(fname):
 
 
 setup(
-    name='findroom',
+    name='cosroom',
     install_requires=REQUIREMENTS,
     version='0.1.0',
     description='Find an open room at COS using the Google Calendar API',
     long_description=read('README.rst'),
     author='Steven Loria',
     author_email='sloria1@gmail.com',
-    url='https://github.com/sloria/findroom',
-    py_modules=['findroom'],
+    url='https://github.com/sloria/cosroom',
+    py_modules=['cosroom'],
     extras_require={
         'web': WEB_REQUIREMENTS,
         'app': APP_REQUIREMENTS,
@@ -37,7 +36,7 @@ setup(
     license='MIT',
     entry_points={
         'console_scripts': [
-            'findroom = app:main'
+            'cosroom = app:main'
         ]
     },
 )

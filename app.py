@@ -11,7 +11,7 @@ from apiclient import discovery
 from oauth2client import client, tools
 from oauth2client.file import Storage
 
-from findroom import get_free_and_busy_rooms
+from cosroom import get_free_and_busy_rooms
 
 try:
     import argparse
@@ -27,11 +27,11 @@ DEBUG = env.bool('RUMPS_DEBUG', default=False)
 CLIENT_SECRET_FILE = env.str('CLIENT_SECRET_FILE', required=True)
 
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
-UPDATE_INTERVAL = env.int('FINDROOM_INTERVAL', default=20)
+UPDATE_INTERVAL = env.int('COSROOM_INTERVAL', default=20)
 
 home_dir = os.path.expanduser('~')
 credential_dir = os.path.join(home_dir, '.credentials')
-credential_path = os.path.join(credential_dir, 'findroom.json')
+credential_path = os.path.join(credential_dir, 'cosroom.json')
 
 
 def get_credentials():
