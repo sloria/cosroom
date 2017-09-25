@@ -20,6 +20,7 @@ CLIENT_ID = env.str('CLIENT_ID', required=True)
 CLIENT_SECRET = env.str('CLIENT_SECRET', required=True)
 SECRET_KEY = env.str('SECRET_KEY', required=True)
 REDIRECT_URI = env.str('REDIRECT_URI', required=True)
+DEBUG = env.bool('FLASK_DEBUG', default=False)
 
 flow = OAuth2WebServerFlow(
     client_id=CLIENT_ID,
@@ -31,6 +32,7 @@ flow = OAuth2WebServerFlow(
 RoomStates = namedtuple('RoomStates', ['free', 'busy'])
 
 app = Flask(__name__)
+app.debug = DEBUG
 app.secret_key = SECRET_KEY
 
 @app.route('/login')
@@ -93,12 +95,12 @@ def index():
     service = get_service(error=False)
     if not service or not check_service(service):
         return redirect(url_for('login'))
-    return render_template('index.html')
+    return render_template('index.html', DEBUG=DEBUG)
 
 @app.route('/logout')
 def logout():
     session['credentials'] = None
-    return render_template('logout.html')
+    return render_template('logout.html', DEBUG=DEBUG)
 
 
 if __name__ == '__main__':
