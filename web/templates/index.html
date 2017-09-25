@@ -30,7 +30,10 @@
 
         <div v-if="featured || free.length">
           <!-- <img v&#45;if="featured.image" v&#45;bind:src="featured.image" v&#45;bind:alt="featured.name" /> -->
-          <div class="featured-image" v-bind:style="featuredStyle">
+          <h2 class="featured-alt visible-sm">{{ featured.name }} is available
+            <span v-if="featured.until">for {{ distance(featured.until) }}</span>
+          </h2>
+          <div class="featured-image hidden-sm" v-bind:style="featuredStyle">
             <h2 class="featured">{{ featured.name }} is available
               <span v-if="featured.until">for {{ distance(featured.until) }}</span>
             </h2>

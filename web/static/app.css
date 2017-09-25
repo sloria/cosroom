@@ -47,9 +47,22 @@ a:hover {
   /* margin-bottom: 0px; */
 }
 
-@media (max-width: 700px) {
+@media (max-width: 950px) {
   .featured {
-    font-size: 5.2vw;
+    font-size: 4.2vw;
+  }
+}
+
+.visible-sm {
+  display: none;
+}
+
+@media (max-width: 550px) {
+  .hidden-sm {
+    display: none;
+  }
+  .visible-sm {
+    display: block;
   }
 }
 
