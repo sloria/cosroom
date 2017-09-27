@@ -15,7 +15,7 @@ Install requirements
 --------------------
 ::
 
-  pip install cosroom[app]
+  pip install git+https://github.com/sloria/cosroom.git#egg=cosroom[app]
 
 Obtaining a client_secret.json file
 -----------------------------------
@@ -51,7 +51,7 @@ Install requirements
 --------------------
 ::
 
-  pip install cosroom[web]
+  pip install git+https://github.com/sloria/cosroom.git#egg=cosroom[web]
 
 
 Define configuration
@@ -88,3 +88,6 @@ Development
 ::
 
   pip install -e .\[web\] .\[app\]
+
+4. Follow the instructions above to run either the macOS app or the web
+   app.
