@@ -50,7 +50,7 @@
             <li v-for="room in free">
               <strong>{{ room.name }}</strong>
               <span v-if="room.until">is available for {{ distance(room.until) }}</span>
-              <a class="btn" v-bind:href="room.createURL" v-if="room.createURL">Reserve now</a>
+              <a v-bind:title="'Reserve ' + room.name" class="btn btn-room-list" v-bind:href="room.createURL" v-if="room.createURL">Reserve now</a>
             </li>
           </ul>
         </div>
@@ -62,11 +62,14 @@
               <strong>{{ room.name }}</strong>
               <span v-if="room.until">
                 (available in {{ distance(room.until) }})
-                <a class="btn" v-bind:href="room.createURL" v-if="room.createURL">Reserve next opening</a>
+                <a v-bind:title="'Reserve ' + room.name" class="btn btn-room-list" v-bind:href="room.createURL" v-if="room.createURL">Reserve next opening</a>
               </span>
             </li>
           </ul>
         </div>
+      <div>
+        <a v-if="loaded" target="_blank" href="https://gist.github.com/sloria/12f7e0dfc6e5d1c6c480bbe5f1f3cb15">Add more rooms</a>
+      </div>
 
       <small v-if="lastUpdated">Last updated {{ lastUpdated.toLocaleString() }}</small>
 

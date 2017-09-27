@@ -57,12 +57,20 @@ a:hover {
   display: none;
 }
 
+.btn-room-list {
+  float: right;
+}
+
 @media (max-width: 550px) {
   .hidden-sm {
     display: none;
   }
   .visible-sm {
     display: block;
+  }
+
+  .btn-room-list {
+    float: none;
   }
 }
 
@@ -78,5 +86,6 @@ nav ul li {
 
 .room-list {
   list-style: none;
+  margin-bottom: 0px;
   padding-left: 0px;
 }
