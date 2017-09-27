@@ -66,9 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 json.free.filter((each) => !each.name.startsWith('Phone Booth'))
               ));
             }
-            // More free rooms
-            const moreFree = this.featured ? json.free.filter((each) => each.name !== this.featured.name) : json.free;
-            this.free = moreFree.map((each) => new Room(each));
+            this.free = json.free.map((each) => new Room(each));
             this.busy = json.busy.map((each) => new Room(each));
             this.lastUpdated = new Date();
             this.loaded = true;

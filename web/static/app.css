@@ -75,3 +75,8 @@ nav ul {
 nav ul li {
   float: right;
 }
+
+.room-list {
+  list-style: none;
+  padding-left: 0px;
+}

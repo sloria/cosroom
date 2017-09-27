@@ -26,7 +26,6 @@
         </nav>
       </header>
 
-
       <div class="content">
 
         <div v-if="!loaded">
@@ -34,7 +33,6 @@
         </div>
 
         <div v-if="featured || free.length">
-          <!-- <img v&#45;if="featured.image" v&#45;bind:src="featured.image" v&#45;bind:alt="featured.name" /> -->
           <h2 class="featured-alt visible-sm">{{ featured.name }} is available
             <span v-if="featured.until">for {{ distance(featured.until) }}</span>
           </h2>
@@ -47,10 +45,8 @@
             <a class="btn" v-bind:href="featured.createURL">Reserve now</a>
           </div>
 
-
-
-          <p v-if="free.length">The following rooms are also available:</p>
-          <ul class="free-room-list">
+          <p v-if="free.length">The following rooms are available now:</p>
+          <ul class="room-list">
             <li v-for="room in free">
               <strong>{{ room.name }}</strong>
               <span v-if="room.until">is available for {{ distance(room.until) }}</span>
@@ -61,7 +57,7 @@
 
         <div v-if="busy.length">
           <p>The following rooms are not yet available:</p>
-          <ul class="busy-room-list">
+          <ul class="room-list">
             <li v-for="room in busy">
               <strong>{{ room.name }}</strong>
               <span v-if="room.until">
