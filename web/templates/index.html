@@ -33,16 +33,18 @@
         </div>
 
         <div v-if="featured || free.length">
-          <h2 class="featured-alt visible-sm">{{ featured.name }} is available
-            <span v-if="featured.until">for {{ distance(featured.until) }}</span>
-          </h2>
-          <div class="featured-image hidden-sm" v-bind:style="featuredStyle">
-            <h2 class="featured">{{ featured.name }} is available
+          <div v-if="featured">
+            <h2 class="featured-alt visible-sm">{{ featured.name }} is available
               <span v-if="featured.until">for {{ distance(featured.until) }}</span>
             </h2>
-          </div>
-          <div v-if="featured.createURL">
-            <a class="btn" v-bind:href="featured.createURL">Reserve now</a>
+            <div class="featured-image hidden-sm" v-bind:style="featuredStyle">
+              <h2 class="featured">{{ featured.name }} is available
+                <span v-if="featured.until">for {{ distance(featured.until) }}</span>
+              </h2>
+            </div>
+            <div v-if="featured.createURL">
+              <a class="btn" v-bind:href="featured.createURL">Reserve now</a>
+            </div>
           </div>
 
           <p v-if="free.length">The following rooms are available now:</p>

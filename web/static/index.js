@@ -60,11 +60,10 @@ document.addEventListener('DOMContentLoaded', () => {
       update: function() {
         fetchJSON('/api/', { credentials: 'include' })
           .then((json) => {
-            if (json.free.length) {
+            const mainRooms = json.free.filter((each) => !each.name.startsWith('Phone Booth'));
+            if (mainRooms.length) {
               // Choose a random room that is not a phone booth
-              this.featured = new Room(randomChoice(
-                json.free.filter((each) => !each.name.startsWith('Phone Booth'))
-              ));
+              this.featured = new Room(randomChoice(mainRooms));
             }
             this.free = json.free.map((each) => new Room(each));
             this.busy = json.busy.map((each) => new Room(each));
