@@ -5,14 +5,8 @@
     <meta name="viewport" content="width=device-width" />
     <title>Find a room at COS</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="stylesheet" href="{{url_for('static', filename='app.css')}}">
-    {% if DEBUG %}
-    <script src="https://unpkg.com/vue@2.4.4/dist/vue.js"></script>
-    {% else %}
-    <script src="https://unpkg.com/vue@2.4.4/dist/vue.min.js"></script>
-    {% endif %}
-    <script src="{{url_for('static', filename='vendor/date-fns/date_fns.js')}}"></script>
-    <script src="{{url_for('static', filename='index.js')}}"></script>
+    {{ stylesheet_tag('main_css') | safe }}
+    {{ javascript_tag('main_js') | safe }}
   </head>
   <body>
     {% raw %}

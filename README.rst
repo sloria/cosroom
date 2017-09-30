@@ -52,6 +52,7 @@ Install requirements
 ::
 
   pip install git+https://github.com/sloria/cosroom.git#egg=cosroom[web]
+  npm install
 
 
 Define configuration
@@ -75,8 +76,10 @@ Then run the following command:
 
 ::
 
-  FLASK_DEBUG=1 FLASK_APP=web/app.py flask run
+  npm start
 
+
+Browse to http://localhost:5000 to view the app.
 
 Development
 ===========
@@ -88,6 +91,7 @@ Development
 ::
 
   pip install -e .\[web\] .\[app\]
+  npm install
 
 4. Follow the instructions above to run either the macOS app or the web
    app.

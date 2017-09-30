@@ -6,6 +6,7 @@ import environs
 import httplib2
 from flask import (Flask, abort, jsonify, redirect, render_template, request,
                    session, url_for)
+from flask_webpack import Webpack
 
 from apiclient.discovery import build
 from cosroom import get_free_and_busy_rooms
@@ -28,12 +29,16 @@ flow = OAuth2WebServerFlow(
     scope='https://www.googleapis.com/auth/calendar.readonly',
     redirect_uri=REDIRECT_URI,
 )
-
 RoomStates = namedtuple('RoomStates', ['free', 'busy'])
 
 app = Flask(__name__)
 app.debug = DEBUG
 app.secret_key = SECRET_KEY
+app.config.update(dict(
+    WEBPACK_MANIFEST_PATH='webpack/manifest.json',
+))
+webpack = Webpack()
+webpack.init_app(app)
 
 @app.route('/login')
 def login():

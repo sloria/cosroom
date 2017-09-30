@@ -1,3 +1,6 @@
+import Vue from 'vue';
+import distanceInWordsToNow from 'date-fns/distance_in_words_to_now';
+
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
     return response;
@@ -19,7 +22,7 @@ const images = {
   Offnen: '/static/images/offnen.jpg',
   Aperi: '/static/images/aperi.jpg',
   Furan: '/static/images/furan.jpg',
-}
+};
 
 function Room(data) {
   this.createURL = data.create_url;
@@ -47,30 +50,30 @@ document.addEventListener('DOMContentLoaded', () => {
       this.update();
     },
     computed: {
-      featuredStyle: function() {
+      featuredStyle() {
         return {
           width: '797px',
           height: '448px',
-          'background-image':'url("' + this.featured.image + '")',
-        }
-      }
+          'background-image': `url("${this.featured.image}")`,
+        };
+      },
     },
     methods: {
-      distance: dateFns.distanceInWordsToNow,
-      update: function() {
+      distance: distanceInWordsToNow,
+      update() {
         fetchJSON('/api/', { credentials: 'include' })
           .then((json) => {
-            const mainRooms = json.free.filter((each) => !each.name.startsWith('Phone Booth'));
+            const mainRooms = json.free.filter(each => !each.name.startsWith('Phone Booth'));
             if (mainRooms.length) {
               // Choose a random room that is not a phone booth
               this.featured = new Room(randomChoice(mainRooms));
             }
-            this.free = json.free.map((each) => new Room(each));
-            this.busy = json.busy.map((each) => new Room(each));
+            this.free = json.free.map(each => new Room(each));
+            this.busy = json.busy.map(each => new Room(each));
             this.lastUpdated = new Date();
             this.loaded = true;
           });
-      }
+      },
     },
   });
 });

@@ -8,6 +8,7 @@ REQUIREMENTS = [
 ]
 WEB_REQUIREMENTS = [
     'flask==0.12.2',
+    'flask-webpack==0.1.0',
 ]
 APP_REQUIREMENTS = [
     'rumps==0.2.2',
@@ -22,7 +23,7 @@ def read(fname):
 setup(
     name='cosroom',
     install_requires=REQUIREMENTS,
-    version='0.1.0',
+    version='1.0.0',
     description='Find an open room at COS using the Google Calendar API',
     long_description=read('README.rst'),
     author='Steven Loria',
