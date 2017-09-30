@@ -26,9 +26,10 @@ module.exports = {
   },
   resolve: {
     extensions: ['.js', '.css'],
-    // Use client-side template compiling, just cuz it's easier for now
     alias: {
-      vue$: 'vue/dist/vue.esm.js',
+      // Pretend we're using react: https://preactjs.com/guide/switching-to-preact
+      "react": "preact-compat",
+      "react-dom": "preact-compat"
     },
   },
   devtool: 'source-map',
