@@ -1,5 +1,5 @@
 {
-  "extends": "airbnb-base",
+  "extends": ["eslint:recommended", "plugin:react/recommended"],
   "parser": "babel-eslint",
   "rules": {
     "no-param-reassign": 0,
@@ -8,6 +8,7 @@
     "consistent-return": 0,
     "no-confusing-arrow": 0,
     "no-underscore-dangle": 0,
+    "react/prop-types": 0,
     "no-new": 0
   },
   "env": {
