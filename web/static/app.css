@@ -5,7 +5,7 @@ body {
 }
 
 div.content {
-  width: 797px;
+  width: 700px;
   max-width: 90%;
   margin: 20px auto;
 }
@@ -38,18 +38,17 @@ a:hover {
 
 .featured {
   position: relative;
-  top: 350px;
+  top: 294px;
   background: rgba(0, 0, 0, 0.75);
   padding: 4px 8px;
   color: white;
   margin: 0;
-  font-size: 2.2em;
-  /* margin-bottom: 0px; */
+  font-size: 2.0em;
 }
 
 @media (max-width: 950px) {
   .featured {
-    font-size: 4.2vw;
+    font-size: 3.7vw;
   }
 }
 
@@ -86,6 +85,6 @@ nav ul li {
 
 .room-list {
   list-style: none;
-  margin-bottom: 0px;
+  margin-bottom: 8px;
   padding-left: 0px;
 }

@@ -52,8 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
     computed: {
       featuredStyle() {
         return {
-          width: '797px',
-          height: '448px',
+          width: '700px',
+          height: '393px',
           'background-image': `url("${this.featured.image}")`,
         };
       },
