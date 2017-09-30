@@ -1,21 +1,8 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { render } from 'react-dom';
 import distanceInWordsToNow from 'date-fns/distance_in_words_to_now';
 
-function checkStatus(response) {
-  if (response.status >= 200 && response.status < 300) {
-    return response;
-  }
-  const error = new Error(response.statusText);
-  error.response = response;
-  throw error;
-}
-function parseJSON(response) {
-  return response.json();
-}
-function fetchJSON(...args) {
-  return fetch(...args).then(checkStatus).then(parseJSON);
-}
+import fetchJSON from './fetch-json';
 
 const images = {
   Aberto: '/static/images/aberto.jpg',
@@ -33,13 +20,11 @@ function Room(data) {
   this.image = images[data.name];
 }
 
-function randomChoice(ary) {
-  return ary[Math.floor(Math.random() * ary.length)];
-}
+const randomChoice = (ary) => ary[Math.floor(Math.random() * ary.length)];
 
 function Header() {
   return (
-    <header v-if="loaded">
+    <header>
       <nav>
         <ul>
           <li><a className="btn" href="/logout">Log out</a></li>
@@ -152,22 +137,22 @@ class App extends React.Component {
   componentDidMount() {
     fetchJSON('/api/', { credentials: 'include' })
       .then((json) => {
-        const newState = {};
-        newState.free = json.free.map(each => new Room(each));
-        newState.busy = json.busy.map(each => new Room(each));
-        newState.lastUpdated = new Date();
-        newState.loaded = true;
-        this.setState(newState);
+        this.setState({
+          free: json.free.map(each => new Room(each)),
+          busy: json.busy.map(each => new Room(each)),
+          lastUpdated: new Date(),
+          loaded: true,
+        });
       });
   }
   render() {
-    const { loaded, featured, free, busy, lastUpdated } = this.state;
+    const { loaded, free, busy, lastUpdated } = this.state;
     return (
       <div>
         <Header />
         <div className="content">
           {loaded || <Loader />}
-          {featured || free.length ? <FreeList rooms={free} /> : ''}
+          {free.length ? <FreeList rooms={free} /> : ''}
           {busy.length ? <BusyList rooms={busy} /> : ''}
           {loaded ?
               <div>
@@ -182,8 +167,5 @@ class App extends React.Component {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  ReactDOM.render(
-    <App/>,
-    document.getElementById('app'),
-  );
+  render(<App/>, document.getElementById('app'));
 });
