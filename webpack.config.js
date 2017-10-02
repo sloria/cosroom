@@ -15,7 +15,7 @@ module.exports = {
   entry: {
     main_js: path.join(__dirname, 'web', 'static', 'main.js'),
     main_css: [
-      path.join(__dirname, 'web', 'static', 'app.css'),
+      path.join(__dirname, 'web', 'static', 'main.css'),
     ],
   },
   output: {

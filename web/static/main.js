@@ -1,6 +1,7 @@
 import React from 'react';
 import { render } from 'react-dom';
 import distanceInWordsToNow from 'date-fns/distance_in_words_to_now';
+import { createSkeletonProvider, createSkeletonElement } from '@trainline/react-skeletor';
 
 import fetchJSON from './fetch-json';
 
@@ -22,6 +23,13 @@ function Room(data) {
 
 const randomChoice = (ary) => ary[Math.floor(Math.random() * ary.length)];
 
+const STRONG = createSkeletonElement('strong');
+const A = createSkeletonElement('a');
+const P = createSkeletonElement('p');
+const SPAN = createSkeletonElement('span');
+const DIV = createSkeletonElement('div');
+const H2 = createSkeletonElement('h2');
+
 function Header() {
   return (
     <header>
@@ -34,33 +42,27 @@ function Header() {
   );
 }
 
-function Loader() {
-  return <div> Finding a room...</div>;
-}
-
-
 function FeaturedRoom({ room }) {
   const style = {
     width: '700px',
     height: '393px',
-    backgroundImage: `url("${room.image}")`,
   };
+  if (room.image) {
+    style.backgroundImage = `url("${room.image}")`;
+  }
   return (
     <div>
-      <h2 className="featured-alt visible-sm">{ room.name } is available
+      <H2 className="featured-alt visible-sm">{ room.name } is available
         {room.until ? <span> for { distanceInWordsToNow(room.until) }</span> : ''}
-      </h2>
-      <div className="featured-image hidden-sm" style={style}>
-        <h2 className="featured">{ room.name } is available
+      </H2>
+      <DIV className="featured-image hidden-sm" style={style}>
+        <H2 className="featured">{ room.name } is available
         {room.until ? <span> for { distanceInWordsToNow(room.until) }</span> : ''}
-        </h2>
+        </H2>
+      </DIV>
+      <div>
+        <A className="btn" href={room.createURL} title={`Reserve ${room.name}`}>Reserve now</A>
       </div>
-      {room.createURL ?
-        <div>
-          <a className="btn" href={room.createURL} title={`Reserve ${room.name}`}>Reserve now</a>
-        </div>
-        : ''
-      }
     </div>
   );
 }
@@ -70,16 +72,16 @@ function BusyList({ rooms }) {
     rooms.map((room) => {
       return (
         <li key={room.name}>
-          <strong>{ room.name }</strong>
-          {room.until ? <span> (available in { distanceInWordsToNow(room.until) })</span> : ''}
-          <a className="btn btn-room-list" href={room.createURL} title={`Reserve ${room.name}`}>Reserve next opening</a>
+          <STRONG>{ room.name }</STRONG>
+          {room.until ? <SPAN> (available in { distanceInWordsToNow(room.until) })</SPAN> : ''}
+          <A className="btn btn-room-list" href={room.createURL} title={`Reserve ${room.name}`}>Reserve next opening</A>
         </li>
       )
     })
   ) : '';
   return (
     <div>
-      { rooms.length ?  <p>The following rooms are not yet available:</p> : '' }
+      { rooms.length ?  <P>The following rooms are not yet available:</P> : '' }
       {
         rooms.length ?
         <ul className="room-list">
@@ -102,9 +104,9 @@ function FreeList({ rooms }) {
     rooms.map((room) => {
       return (
         <li key={room.name}>
-          <strong>{ room.name }</strong>
-          {room.until ? <span> is available for { distanceInWordsToNow(room.until) }</span> : ''}
-          <a className="btn btn-room-list" href={room.createURL} title={`Reserve ${room.name}`}>Reserve now</a>
+          <STRONG>{ room.name }</STRONG>
+          {room.until ? <SPAN> is available for { distanceInWordsToNow(room.until) }</SPAN> : ''}
+          <A className="btn btn-room-list" href={room.createURL} title={`Reserve ${room.name}`}>Reserve now</A>
         </li>
       )
     })
@@ -112,7 +114,7 @@ function FreeList({ rooms }) {
   return (
     <div>
       {featured ? <FeaturedRoom room={featured} /> : ''}
-      { rooms.length ?  <p>The following rooms are available now:</p> : '' }
+      { rooms.length ?  <P>The following rooms are available now:</P> : '' }
       {
         rooms.length ?
         <ul className="room-list">
@@ -124,7 +126,42 @@ function FreeList({ rooms }) {
   );
 }
 
-class App extends React.Component {
+function App({ free, busy, lastUpdated }) {
+    return (
+      <div>
+        <Header />
+        <div className="content">
+          {free.length ? <FreeList rooms={free} /> : ''}
+          {busy.length ? <BusyList rooms={busy} /> : ''}
+          <div>
+            <A rel="noopener noreferrer" target="_blank" href="https://gist.github.com/sloria/12f7e0dfc6e5d1c6c480bbe5f1f3cb15">Add more rooms</A>
+          </div>
+          {lastUpdated ? <small>Last updated {lastUpdated.toLocaleString()}</small> : ''}
+        </div>
+      </div>
+    );
+}
+
+const createDummyRoom = (name) => new Room({
+  name: name,
+  until: new Date().toISOString(),
+});
+
+
+const dummyData = {
+    free: [createDummyRoom('1___'), createDummyRoom('2___')],
+    busy: [createDummyRoom('3____'), createDummyRoom('4____')],
+};
+
+const WrappedApp = createSkeletonProvider(
+  dummyData,
+  // Whether to show skeleton screen
+  (props) => !props.loaded,
+  // CSS class to apply when loading
+  () => 'loading-skeleton',
+)(App);
+
+class StatefulApp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -146,26 +183,10 @@ class App extends React.Component {
       });
   }
   render() {
-    const { loaded, free, busy, lastUpdated } = this.state;
-    return (
-      <div>
-        <Header />
-        <div className="content">
-          {loaded || <Loader />}
-          {free.length ? <FreeList rooms={free} /> : ''}
-          {busy.length ? <BusyList rooms={busy} /> : ''}
-          {loaded ?
-              <div>
-                <a rel="noopener noreferrer" target="_blank" href="https://gist.github.com/sloria/12f7e0dfc6e5d1c6c480bbe5f1f3cb15">Add more rooms</a>
-              </div>
-          : ''}
-          {lastUpdated ? <small>Last updated {lastUpdated.toLocaleString()}</small> : ''}
-        </div>
-      </div>
-    );
+    return <WrappedApp {...this.state} />;
   }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  render(<App/>, document.getElementById('app'));
+  render(<StatefulApp/>, document.getElementById('app'));
 });
