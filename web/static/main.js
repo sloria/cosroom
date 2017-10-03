@@ -42,12 +42,12 @@ function Header() {
   );
 }
 
-function FeaturedRoom({ room }) {
+function FeaturedRoom({ room, loaded }) {
   const style = {
     width: '700px',
     height: '393px',
   };
-  if (room.image) {
+  if (loaded && room.image) {
     style.backgroundImage = `url("${room.image}")`;
   }
   return (
@@ -93,7 +93,7 @@ function BusyList({ rooms }) {
   );
 }
 
-function FreeList({ rooms }) {
+function FreeList({ rooms, loaded }) {
   const mainRooms = rooms.filter(each => !each.name.startsWith('Phone Booth'));
   let featured = null;
   if (mainRooms.length) {
@@ -113,7 +113,7 @@ function FreeList({ rooms }) {
   ) : '';
   return (
     <div>
-      {featured ? <FeaturedRoom room={featured} /> : ''}
+      {featured ? <FeaturedRoom loaded={loaded} room={featured} /> : ''}
       { rooms.length ?  <P>The following rooms are available now:</P> : '' }
       {
         rooms.length ?
@@ -126,20 +126,23 @@ function FreeList({ rooms }) {
   );
 }
 
-function App({ free, busy, lastUpdated }) {
-    return (
-      <div>
-        <Header />
-        <div className="content">
-          {free.length ? <FreeList rooms={free} /> : ''}
-          {busy.length ? <BusyList rooms={busy} /> : ''}
-          <div>
-            <A rel="noopener noreferrer" target="_blank" href="https://gist.github.com/sloria/12f7e0dfc6e5d1c6c480bbe5f1f3cb15">Add more rooms</A>
-          </div>
-          {lastUpdated ? <small>Last updated {lastUpdated.toLocaleString()}</small> : ''}
+function App({ free, busy, lastUpdated, onUpdate, loaded }) {
+  return (
+    <div>
+      <Header />
+      <div className="content">
+        {free.length ? <FreeList loaded={loaded} rooms={free} /> : ''}
+        {busy.length ? <BusyList loaded={loaded} rooms={busy} /> : ''}
+        <div>
+          <A rel="noopener noreferrer" target="_blank" href="https://gist.github.com/sloria/12f7e0dfc6e5d1c6c480bbe5f1f3cb15">Add more rooms</A>
         </div>
+        {lastUpdated ? <small>
+          Last updated {lastUpdated.toLocaleString()}{'  '}
+          <a className='btn' onClick={onUpdate}>Update</a>
+        </small> : ''}
       </div>
-    );
+    </div>
+  );
 }
 
 const createDummyRoom = (name) => new Room({
@@ -154,7 +157,7 @@ const dummyData = {
 };
 
 const WrappedApp = createSkeletonProvider(
-  dummyData,
+  (props) => (props.free.length || props.busy.length) ? props : dummyData,
   // Whether to show skeleton screen
   (props) => !props.loaded,
   // CSS class to apply when loading
@@ -170,8 +173,10 @@ class StatefulApp extends React.Component {
       loaded: false,
       lastUpdated: null,
     };
+    this.handleUpdate = this.handleUpdate.bind(this);
   }
-  componentDidMount() {
+  update() {
+    this.setState({ loaded: false });
     fetchJSON('/api/', { credentials: 'include' })
       .then((json) => {
         this.setState({
@@ -182,8 +187,14 @@ class StatefulApp extends React.Component {
         });
       });
   }
+  componentDidMount() {
+    this.update();
+  }
+  handleUpdate() {
+    this.update();
+  }
   render() {
-    return <WrappedApp {...this.state} />;
+    return <WrappedApp {...this.state} onUpdate={this.handleUpdate} />;
   }
 }
 
