@@ -93,18 +93,25 @@ function BusyList({ rooms }) {
   );
 }
 
-function FreeList({ rooms, loaded }) {
+function FreeList({ rooms, loaded, selectedRoom, onClickRoom }) {
   const mainRooms = rooms.filter(each => !each.name.startsWith('Phone Booth'));
   let featured = null;
-  if (mainRooms.length) {
+  if (selectedRoom) {
+    featured = selectedRoom;
+  } else if (mainRooms.length) {
     // Choose a random room that is not a phone booth
     featured = randomChoice(mainRooms);
   }
   const roomsElem = rooms.length ? (
     rooms.map((room) => {
+      const roomName = (
+        room.name.startsWith('Phone Booth') ?
+        room.name :
+        <a className='room-name' onClick={onClickRoom.bind(this, room)}>{ room.name }</a>
+      )
       return (
         <li key={room.name}>
-          <STRONG>{ room.name }</STRONG>
+          <STRONG>{roomName}</STRONG>
           {room.until ? <SPAN> is available for { distanceInWordsToNow(room.until) }</SPAN> : ''}
           <A className="btn btn-room-list" href={room.createURL} title={`Reserve ${room.name}`}>Reserve now</A>
         </li>
@@ -126,12 +133,12 @@ function FreeList({ rooms, loaded }) {
   );
 }
 
-function App({ free, busy, lastUpdated, onUpdate, loaded }) {
+function App({ free, busy, lastUpdated, onUpdate, loaded, onClickRoom, selectedRoom }) {
   return (
     <div>
       <Header />
       <div className="content">
-        {free.length ? <FreeList loaded={loaded} rooms={free} /> : ''}
+        {free.length ? <FreeList selectedRoom={selectedRoom} loaded={loaded} rooms={free} onClickRoom={onClickRoom} /> : ''}
         {busy.length ? <BusyList loaded={loaded} rooms={busy} /> : ''}
         <div>
           <A rel="noopener noreferrer" target="_blank" href="https://gist.github.com/sloria/12f7e0dfc6e5d1c6c480bbe5f1f3cb15">Add more rooms</A>
@@ -172,8 +179,10 @@ class StatefulApp extends React.Component {
       busy: [],
       loaded: false,
       lastUpdated: null,
+      selectedRoom: null,
     };
     this.handleUpdate = this.handleUpdate.bind(this);
+    this.handleClickRoom = this.handleClickRoom.bind(this);
   }
   update() {
     this.setState({ loaded: false });
@@ -190,11 +199,16 @@ class StatefulApp extends React.Component {
   componentDidMount() {
     this.update();
   }
+  handleClickRoom(room) {
+    this.setState({ selectedRoom: room });
+  }
   handleUpdate() {
     this.update();
   }
   render() {
-    return <WrappedApp {...this.state} onUpdate={this.handleUpdate} />;
+    return <WrappedApp {...this.state} 
+      onClickRoom={this.handleClickRoom}
+      onUpdate={this.handleUpdate} />;
   }
 }
 
