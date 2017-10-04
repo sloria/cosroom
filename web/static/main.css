@@ -49,7 +49,7 @@ a.room-name {
   padding: 4px 8px;
   color: white;
   margin: 0;
-  font-size: 2.0em;
+  font-size: 1.7em;
 }
 
 @media (max-width: 950px) {
@@ -95,10 +95,12 @@ nav ul li {
   padding-left: 0px;
 }
 
-a.room-name:hover {
-  background-color: inherit;
+a.room-name {
   border-bottom: 1px dotted #000;
   text-decoration: none;
+}
+a.room-name:hover {
+  background-color: inherit;
 }
 
 @keyframes progress {
@@ -113,6 +115,7 @@ a.room-name:hover {
 .loading-skeleton, .loading-skeleton a {
     animation: progress 1.2s ease-in-out infinite;
     color: rgba(0, 0, 0, 0.0) !important;
+    border: none;
     background-color: #eee;
     background-image: linear-gradient(90deg, #eee, #f5f5f5, #eee);
     background-repeat: no-repeat;

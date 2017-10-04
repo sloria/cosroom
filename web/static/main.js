@@ -42,7 +42,7 @@ function Header() {
   );
 }
 
-function FeaturedRoom({ room, loaded }) {
+function FeaturedRoom({ room, loaded, free }) {
   const style = {
     width: '700px',
     height: '393px',
@@ -56,23 +56,28 @@ function FeaturedRoom({ room, loaded }) {
         {room.until ? <span> for { distanceInWordsToNow(room.until) }</span> : ''}
       </H2>
       <DIV className="featured-image hidden-sm" style={style}>
-        <H2 className="featured">{ room.name } is available
-        {room.until ? <span> for { distanceInWordsToNow(room.until) }</span> : ''}
+        <H2 className="featured">{ room.name } {free ? 'is available' : 'will be available'}
+        {room.until ? <span> {free ? 'for' : 'in' } { distanceInWordsToNow(room.until) }</span> : ''}
         </H2>
       </DIV>
       <div>
-        <A className="btn" href={room.createURL} title={`Reserve ${room.name}`}>Reserve now</A>
+        <A className="btn" href={room.createURL} title={`Reserve ${room.name}`}>Reserve {free ? 'now' : 'next opening'}</A>
       </div>
     </div>
   );
 }
 
-function BusyList({ rooms }) {
+function BusyList({ rooms , onClickRoom }) {
   const roomsElem = rooms.length ? (
     rooms.map((room) => {
+      const roomName = (
+        room.name in images ?
+        <a className='room-name' onClick={onClickRoom.bind(this, room, false)}>{ room.name }</a> :
+        room.name
+      );
       return (
         <li key={room.name}>
-          <STRONG>{ room.name }</STRONG>
+          <STRONG>{roomName}</STRONG>
           {room.until ? <SPAN> (available in { distanceInWordsToNow(room.until) })</SPAN> : ''}
           <A className="btn btn-room-list" href={room.createURL} title={`Reserve ${room.name}`}>Reserve next opening</A>
         </li>
@@ -93,22 +98,14 @@ function BusyList({ rooms }) {
   );
 }
 
-function FreeList({ rooms, loaded, selectedRoom, onClickRoom }) {
-  const mainRooms = rooms.filter(each => !each.name.startsWith('Phone Booth'));
-  let featured = null;
-  if (selectedRoom) {
-    featured = selectedRoom;
-  } else if (mainRooms.length) {
-    // Choose a random room that is not a phone booth
-    featured = randomChoice(mainRooms);
-  }
+function FreeList({ rooms, onClickRoom }) {
   const roomsElem = rooms.length ? (
     rooms.map((room) => {
       const roomName = (
-        room.name.startsWith('Phone Booth') ?
-        room.name :
-        <a className='room-name' onClick={onClickRoom.bind(this, room)}>{ room.name }</a>
-      )
+        room.name in images ?
+        <a className='room-name' onClick={onClickRoom.bind(this, room, true)}>{ room.name }</a> :
+        room.name
+      );
       return (
         <li key={room.name}>
           <STRONG>{roomName}</STRONG>
@@ -120,7 +117,6 @@ function FreeList({ rooms, loaded, selectedRoom, onClickRoom }) {
   ) : '';
   return (
     <div>
-      {featured ? <FeaturedRoom loaded={loaded} room={featured} /> : ''}
       { rooms.length ?  <P>The following rooms are available now:</P> : '' }
       {
         rooms.length ?
@@ -133,13 +129,14 @@ function FreeList({ rooms, loaded, selectedRoom, onClickRoom }) {
   );
 }
 
-function App({ free, busy, lastUpdated, onUpdate, loaded, onClickRoom, selectedRoom }) {
+function App({ free, busy, lastUpdated, onUpdate, loaded, onClickRoom, selectedRoom, selectedRoomFree }) {
   return (
     <div>
       <Header />
       <div className="content">
+        {selectedRoom ? <FeaturedRoom loaded={loaded} room={selectedRoom} free={selectedRoomFree} /> : ''}
         {free.length ? <FreeList selectedRoom={selectedRoom} loaded={loaded} rooms={free} onClickRoom={onClickRoom} /> : ''}
-        {busy.length ? <BusyList loaded={loaded} rooms={busy} /> : ''}
+        {busy.length ? <BusyList loaded={loaded} rooms={busy} onClickRoom={onClickRoom} /> : ''}
         <div>
           <A rel="noopener noreferrer" target="_blank" href="https://gist.github.com/sloria/12f7e0dfc6e5d1c6c480bbe5f1f3cb15">Add more rooms</A>
         </div>
@@ -161,15 +158,34 @@ const createDummyRoom = (name) => new Room({
 const dummyData = {
     free: [createDummyRoom('1___'), createDummyRoom('2___')],
     busy: [createDummyRoom('3____'), createDummyRoom('4____')],
+    selectedRoom: createDummyRoom('5___'),
 };
 
 const WrappedApp = createSkeletonProvider(
   (props) => (props.free.length || props.busy.length) ? props : dummyData,
   // Whether to show skeleton screen
   (props) => !props.loaded,
+  // (props) => true,
   // CSS class to apply when loading
   () => 'loading-skeleton',
 )(App);
+
+
+function selectFeatured(free, busy) {
+  // Choose a random room that is not a phone booth
+  const mainFreeRooms = free.filter(rm => !rm.name.startsWith('Phone Booth'));
+  const mainBusyRooms = busy.filter(rm => !rm.name.startsWith('Phone Booth'));
+  let featured = null;
+  let isFree = false;
+  if (mainFreeRooms.length) {
+    featured = randomChoice(mainFreeRooms);
+    isFree = true;
+  } else if (mainBusyRooms.length) {
+    featured = randomChoice(mainBusyRooms);
+    isFree = false;
+  }
+  return { room: featured, isFree };
+}
 
 class StatefulApp extends React.Component {
   constructor(props) {
@@ -177,7 +193,7 @@ class StatefulApp extends React.Component {
     this.state = {
       free: [],
       busy: [],
-      loaded: false,
+      loaded: true,
       lastUpdated: null,
       selectedRoom: null,
     };
@@ -188,25 +204,30 @@ class StatefulApp extends React.Component {
     this.setState({ loaded: false });
     fetchJSON('/api/', { credentials: 'include' })
       .then((json) => {
+        const free = json.free.map(each => new Room(each))
+        const busy = json.busy.map(each => new Room(each));
+        const { room, isFree } = selectFeatured(free, busy);
         this.setState({
-          free: json.free.map(each => new Room(each)),
-          busy: json.busy.map(each => new Room(each)),
+          free,
+          busy,
           lastUpdated: new Date(),
           loaded: true,
+          selectedRoom: room,
+          selectedRoomFree: isFree,
         });
       });
   }
   componentDidMount() {
     this.update();
   }
-  handleClickRoom(room) {
-    this.setState({ selectedRoom: room });
+  handleClickRoom(room, isFree) {
+    this.setState({ selectedRoom: room, selectedRoomFree: isFree });
   }
   handleUpdate() {
     this.update();
   }
   render() {
-    return <WrappedApp {...this.state} 
+    return <WrappedApp {...this.state}
       onClickRoom={this.handleClickRoom}
       onUpdate={this.handleUpdate} />;
   }
