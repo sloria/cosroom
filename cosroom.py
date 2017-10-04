@@ -11,12 +11,14 @@ RoomStates = namedtuple('RoomStates', ['free', 'busy'])
 def get_calendars(service):
     return [
         calendar for calendar in service.calendarList().list().execute()['items']
-        if calendar['accessRole'] == 'freeBusyReader'
+        if calendar.get('accessRole') == 'freeBusyReader'
     ]
 
 
 def get_free_and_busy_rooms(service):
     calendars = get_calendars(service)
+    if not calendars:
+        return RoomStates([], [])
     room_ids = {
         each['id']: each['summary']
         for each in calendars
