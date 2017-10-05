@@ -138,7 +138,7 @@ function App({ free, busy, lastUpdated, onUpdate, loaded, onClickRoom, selectedR
         {free.length ? <FreeList selectedRoom={selectedRoom} loaded={loaded} rooms={free} onClickRoom={onClickRoom} /> : ''}
         {busy.length ? <BusyList loaded={loaded} rooms={busy} onClickRoom={onClickRoom} /> : ''}
         <div>
-          <A rel="noopener noreferrer" target="_blank" href="https://gist.github.com/sloria/12f7e0dfc6e5d1c6c480bbe5f1f3cb15">Add more rooms</A>
+          <a rel="noopener noreferrer" target="_blank" href="https://gist.github.com/sloria/12f7e0dfc6e5d1c6c480bbe5f1f3cb15">Add more rooms</a>
         </div>
         {lastUpdated ? <small>
           Last updated {lastUpdated.toLocaleString()}{'  '}
