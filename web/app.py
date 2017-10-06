@@ -7,6 +7,7 @@ import httplib2
 from flask import (Flask, abort, jsonify, redirect, render_template, request,
                    session, url_for)
 from flask_webpack import Webpack
+from flask_compress import Compress
 
 from apiclient.discovery import build
 from cosroom import get_free_and_busy_rooms
@@ -39,6 +40,8 @@ app.config.update(dict(
 ))
 webpack = Webpack()
 webpack.init_app(app)
+compress = Compress()
+compress.init_app(app)
 
 @app.route('/login')
 def login():
