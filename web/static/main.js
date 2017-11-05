@@ -1,7 +1,10 @@
 import React from 'react';
 import { render } from 'react-dom';
 import distanceInWordsToNow from 'date-fns/distance_in_words_to_now';
-import { createSkeletonProvider, createSkeletonElement } from '@trainline/react-skeletor';
+import {
+  createSkeletonProvider,
+  createSkeletonElement,
+} from '@trainline/react-skeletor';
 
 import fetchJSON from './fetch-json';
 
@@ -21,7 +24,7 @@ function Room(data) {
   this.image = images[data.name];
 }
 
-const randomChoice = (ary) => ary[Math.floor(Math.random() * ary.length)];
+const randomChoice = ary => ary[Math.floor(Math.random() * ary.length)];
 
 const STRONG = createSkeletonElement('strong');
 const A = createSkeletonElement('a');
@@ -35,7 +38,11 @@ function Header() {
     <header>
       <nav>
         <ul>
-          <li><a className="btn" href="/logout">Log out</a></li>
+          <li>
+            <a className="btn" href="/logout">
+              Log out
+            </a>
+          </li>
         </ul>
       </nav>
     </header>
@@ -52,124 +59,215 @@ function FeaturedRoom({ room, loaded, free }) {
   }
   return (
     <div>
-      <H2 className="featured-alt visible-sm">{ room.name } is available
-        {room.until ? <span> for { distanceInWordsToNow(room.until) }</span> : ''}
+      <H2 className="featured-alt visible-sm">
+        {room.name} is available
+        {room.until ? <span> for {distanceInWordsToNow(room.until)}</span> : ''}
       </H2>
       <DIV className="featured-image hidden-sm" style={style}>
-        <H2 className="featured">{ room.name } {free ? 'is available' : 'will be available'}
-        {room.until ? <span> {free ? 'for' : 'in' } { distanceInWordsToNow(room.until) }</span> : ''}
+        <H2 className="featured">
+          {room.name} {free ? 'is available' : 'will be available'}
+          {room.until ? (
+            <span>
+              {' '}
+              {free ? 'for' : 'in'} {distanceInWordsToNow(room.until)}
+            </span>
+          ) : (
+            ''
+          )}
         </H2>
       </DIV>
       <div>
-        <A className="btn" href={room.createURL} title={`Reserve ${room.name}`}>Reserve {free ? 'now' : 'next opening'}</A>
+        <A className="btn" href={room.createURL} title={`Reserve ${room.name}`}>
+          Reserve {free ? 'now' : 'next opening'}
+        </A>
       </div>
     </div>
   );
 }
 
-function BusyList({ rooms , onClickRoom }) {
-  const roomsElem = rooms.length ? (
-    rooms.map((room) => {
-      const roomName = (
-        room.name in images ?
-        <a className='room-name' onClick={onClickRoom.bind(this, room, false)}>{ room.name }</a> :
-        room.name
-      );
-      return (
-        <li key={room.name}>
-          <STRONG>{roomName}</STRONG>
-          {room.until ? <SPAN> (available in { distanceInWordsToNow(room.until) })</SPAN> : ''}
-          <A className="btn btn-room-list" href={room.createURL} title={`Reserve ${room.name}`}>Reserve next opening</A>
-        </li>
-      )
-    })
-  ) : '';
+function BusyList({ rooms, onClickRoom }) {
+  const roomsElem = rooms.length
+    ? rooms.map(room => {
+        const roomName =
+          room.name in images ? (
+            <a
+              className="room-name"
+              onClick={onClickRoom.bind(this, room, false)}
+            >
+              {room.name}
+            </a>
+          ) : (
+            room.name
+          );
+        return (
+          <li key={room.name}>
+            <STRONG>{roomName}</STRONG>
+            {room.until ? (
+              <SPAN> (available in {distanceInWordsToNow(room.until)})</SPAN>
+            ) : (
+              ''
+            )}
+            <A
+              className="btn btn-room-list"
+              href={room.createURL}
+              title={`Reserve ${room.name}`}
+            >
+              Reserve next opening
+            </A>
+          </li>
+        );
+      })
+    : '';
   return (
     <div>
-      { rooms.length ?  <P>The following rooms are not yet available:</P> : '' }
-      {
-        rooms.length ?
-        <ul className="room-list">
-          {roomsElem}
-        </ul>
-        : ''
-      }
+      {rooms.length ? <P>The following rooms are not yet available:</P> : ''}
+      {rooms.length ? <ul className="room-list">{roomsElem}</ul> : ''}
     </div>
   );
 }
 
 function FreeList({ rooms, onClickRoom }) {
-  const roomsElem = rooms.length ? (
-    rooms.map((room) => {
-      const roomName = (
-        room.name in images ?
-        <a className='room-name' onClick={onClickRoom.bind(this, room, true)}>{ room.name }</a> :
-        room.name
-      );
-      return (
-        <li key={room.name}>
-          <STRONG>{roomName}</STRONG>
-          {room.until ? <SPAN> is available for { distanceInWordsToNow(room.until) }</SPAN> : ''}
-          <A className="btn btn-room-list" href={room.createURL} title={`Reserve ${room.name}`}>Reserve now</A>
-        </li>
-      )
-    })
-  ) : '';
+  const roomsElem = rooms.length
+    ? rooms.map(room => {
+        const roomName =
+          room.name in images ? (
+            <a
+              className="room-name"
+              onClick={onClickRoom.bind(this, room, true)}
+            >
+              {room.name}
+            </a>
+          ) : (
+            room.name
+          );
+        return (
+          <li key={room.name}>
+            <STRONG>{roomName}</STRONG>
+            {room.until ? (
+              <SPAN> is available for {distanceInWordsToNow(room.until)}</SPAN>
+            ) : (
+              ''
+            )}
+            <A
+              className="btn btn-room-list"
+              href={room.createURL}
+              title={`Reserve ${room.name}`}
+            >
+              Reserve now
+            </A>
+          </li>
+        );
+      })
+    : '';
   return (
     <div>
-      { rooms.length ?  <P>The following rooms are available now:</P> : '' }
-      {
-        rooms.length ?
-        <ul className="room-list">
-          {roomsElem}
-        </ul>
-        : ''
-      }
+      {rooms.length ? <P>The following rooms are available now:</P> : ''}
+      {rooms.length ? <ul className="room-list">{roomsElem}</ul> : ''}
     </div>
   );
 }
 
-function App({ free, busy, lastUpdated, onUpdate, loaded, onClickRoom, selectedRoom, selectedRoomFree }) {
+function NextEvent({ nextEvent }) {
+  return nextEvent ? (
+    <DIV className="NextEvent">
+      <p>
+        Your next meeting is in {distanceInWordsToNow(nextEvent.start.dateTime) + ' '}
+        (<a href={nextEvent.htmlLink}>{nextEvent.summary}</a>)
+        {nextEvent.location ? ` in ${nextEvent.location}` : ''}
+      </p>
+    </DIV>
+  ) : '';
+}
+
+function App({
+  free,
+  busy,
+  nextEvent,
+  lastUpdated,
+  onUpdate,
+  loaded,
+  onClickRoom,
+  selectedRoom,
+  selectedRoomFree,
+}) {
   return (
     <div>
       <Header />
       <div className="content">
-        {selectedRoom ? <FeaturedRoom loaded={loaded} room={selectedRoom} free={selectedRoomFree} /> : ''}
-        {free.length ? <FreeList selectedRoom={selectedRoom} loaded={loaded} rooms={free} onClickRoom={onClickRoom} /> : ''}
-        {busy.length ? <BusyList loaded={loaded} rooms={busy} onClickRoom={onClickRoom} /> : ''}
+        <NextEvent nextEvent={nextEvent} />
+        {selectedRoom ? (
+          <FeaturedRoom
+            loaded={loaded}
+            room={selectedRoom}
+            free={selectedRoomFree}
+          />
+        ) : (
+          ''
+        )}
+        {free.length ? (
+          <FreeList
+            selectedRoom={selectedRoom}
+            loaded={loaded}
+            rooms={free}
+            onClickRoom={onClickRoom}
+          />
+        ) : (
+          ''
+        )}
+        {busy.length ? (
+          <BusyList loaded={loaded} rooms={busy} onClickRoom={onClickRoom} />
+        ) : (
+          ''
+        )}
         <div>
-          <a rel="noopener noreferrer" target="_blank" href="https://gist.github.com/sloria/12f7e0dfc6e5d1c6c480bbe5f1f3cb15">Add more rooms</a>
+          <a
+            rel="noopener noreferrer"
+            target="_blank"
+            href="https://gist.github.com/sloria/12f7e0dfc6e5d1c6c480bbe5f1f3cb15"
+          >
+            Add more rooms
+          </a>
         </div>
-        {lastUpdated ? <small>
-          Last updated {lastUpdated.toLocaleString()}{'  '}
-          <a className='btn' onClick={onUpdate}>Update</a>
-        </small> : ''}
+        {lastUpdated ? (
+          <small>
+            Last updated {lastUpdated.toLocaleString()}
+            {'  '}
+            <a className="btn" onClick={onUpdate}>
+              Update
+            </a>
+          </small>
+        ) : (
+          ''
+        )}
       </div>
     </div>
   );
 }
 
-const createDummyRoom = (name) => new Room({
-  name: name,
-  until: new Date().toISOString(),
-});
-
+const createDummyRoom = name =>
+  new Room({
+    name: name,
+    until: new Date().toISOString(),
+  });
 
 const dummyData = {
-    free: [createDummyRoom('1___'), createDummyRoom('2___')],
-    busy: [createDummyRoom('3____'), createDummyRoom('4____')],
-    selectedRoom: createDummyRoom('5___'),
+  free: [createDummyRoom('1___'), createDummyRoom('2___')],
+  busy: [createDummyRoom('3____'), createDummyRoom('4____')],
+  nextEvent: {
+    summary: 'abcdefg',
+    start: { dateTime: new Date().toISOString() },
+  },
+  selectedRoom: createDummyRoom('5___'),
 };
 
 const WrappedApp = createSkeletonProvider(
-  (props) => (props.free.length || props.busy.length) ? props : dummyData,
+  props => (props.free.length || props.busy.length ? props : dummyData),
   // Whether to show skeleton screen
-  (props) => !props.loaded,
+  props => !props.loaded,
   // (props) => true,
   // CSS class to apply when loading
   () => 'loading-skeleton',
 )(App);
-
 
 function selectFeatured(free, busy) {
   // Choose a random room that is not a phone booth
@@ -202,20 +300,21 @@ class StatefulApp extends React.Component {
   }
   update() {
     this.setState({ loaded: false });
-    fetchJSON('/api/', { credentials: 'include' })
-      .then((json) => {
-        const free = json.free.map(each => new Room(each))
-        const busy = json.busy.map(each => new Room(each));
-        const { room, isFree } = selectFeatured(free, busy);
-        this.setState({
-          free,
-          busy,
-          lastUpdated: new Date(),
-          loaded: true,
-          selectedRoom: room,
-          selectedRoomFree: isFree,
-        });
+    fetchJSON('/api/', { credentials: 'include' }).then(json => {
+      const free = json.free.map(each => new Room(each));
+      const busy = json.busy.map(each => new Room(each));
+      const nextEvent = json.next_event;
+      const { room, isFree } = selectFeatured(free, busy);
+      this.setState({
+        free,
+        busy,
+        nextEvent,
+        lastUpdated: new Date(),
+        loaded: true,
+        selectedRoom: room,
+        selectedRoomFree: isFree,
       });
+    });
   }
   componentDidMount() {
     this.update();
@@ -227,12 +326,16 @@ class StatefulApp extends React.Component {
     this.update();
   }
   render() {
-    return <WrappedApp {...this.state}
-      onClickRoom={this.handleClickRoom}
-      onUpdate={this.handleUpdate} />;
+    return (
+      <WrappedApp
+        {...this.state}
+        onClickRoom={this.handleClickRoom}
+        onUpdate={this.handleUpdate}
+      />
+    );
   }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  render(<StatefulApp/>, document.getElementById('app'));
+  render(<StatefulApp />, document.getElementById('app'));
 });

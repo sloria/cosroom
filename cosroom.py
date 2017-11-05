@@ -5,26 +5,44 @@ import pytz
 from urllib.parse import urlencode, quote_plus
 import maya
 
-RoomStates = namedtuple('RoomStates', ['free', 'busy'])
+RoomStates = namedtuple('RoomStates', ['free', 'busy', 'next_event'])
 
 
-def get_calendars(service):
+def get_calendar_list(service):
+    return service.calendarList().list().execute()['items']
+
+def get_primary_calendar(calendar_list):
+    return next(
+        cal for cal in calendar_list if cal.get('primary', False)
+    )
+
+def get_room_calendars(calendar_list):
     return [
-        calendar for calendar in service.calendarList().list().execute()['items']
+        calendar for calendar in calendar_list
         if calendar.get('accessRole') == 'freeBusyReader'
     ]
 
-
 def get_free_and_busy_rooms(service):
-    calendars = get_calendars(service)
+    calendar_list = get_calendar_list(service)
+    calendars = get_room_calendars(calendar_list)
     if not calendars:
-        return RoomStates([], [])
+        return RoomStates([], [], None)
     room_ids = {
         each['id']: each['summary']
         for each in calendars
     }
     timemin = dt.datetime.utcnow().replace(tzinfo=pytz.utc)
     timemax = (dt.datetime.utcnow() + dt.timedelta(hours=24)).replace(tzinfo=pytz.utc)
+
+    primary_calendar = get_primary_calendar(calendar_list)
+    primary_events = service.events().list(
+        calendarId=primary_calendar['id'],
+        orderBy='startTime',
+        singleEvents=True,
+        timeMin=timemin.isoformat()
+    ).execute()['items']
+    if primary_events:
+        next_event = primary_events[0]
 
     free = []
     busy = []
@@ -73,7 +91,7 @@ def get_free_and_busy_rooms(service):
             })
     free.sort(key=lambda each: each['name'])
     busy.sort(key=lambda each: each['name'])
-    return RoomStates(free, busy)
+    return RoomStates(free, busy, next_event)
 
 
 def create_event_url(

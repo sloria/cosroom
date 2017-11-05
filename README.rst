@@ -91,6 +91,7 @@ Development
 ::
 
   pip install -e .\[web\] .\[app\]
+  npm install npm@5
   npm install
 
 4. Follow the instructions above to run either the macOS app or the web

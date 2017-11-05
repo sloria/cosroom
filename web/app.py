@@ -1,6 +1,7 @@
 #!/usr/bin/python2.7
 import os
 from collections import namedtuple
+import logging
 
 import environs
 import httplib2
@@ -14,6 +15,7 @@ from cosroom import get_free_and_busy_rooms
 from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
 
+logger = logging.getLogger(__name__)
 env = environs.Env()
 # Read .env file
 if os.path.isfile('.env'):
@@ -62,7 +64,8 @@ def oauth2callback():
         flow.redirect_uri = request.base_url
         try:
             credentials = flow.step2_exchange(code)
-        except Exception as e:
+        except Exception:
+            logger.exception('Error occurred during OAuth flow')
             abort(400)
         session['credentials'] = credentials.to_json()
 
@@ -83,10 +86,11 @@ def get_service(error=False):
 @app.route('/api/')
 def api():
     service = get_service(error=True)
-    free, busy = get_free_and_busy_rooms(service)
+    free, busy, next_event = get_free_and_busy_rooms(service)
     return jsonify({
         'free': free,
         'busy': busy,
+        'next_event': next_event,
     })
 
 def check_service(service):
