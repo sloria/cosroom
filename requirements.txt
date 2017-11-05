@@ -1,5 +1,5 @@
-# Requirements for the web app
-.[web]
+# Install the cosroom package
+.
 
 # Deployment
 gunicorn==19.1.1
