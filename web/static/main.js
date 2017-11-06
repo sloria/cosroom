@@ -175,7 +175,7 @@ function NextEvent({ nextEvent }) {
       <p>
         Your next meeting is in {distanceInWordsToNow(nextEvent.start.dateTime) + ' '}
         (<a href={nextEvent.htmlLink}>{nextEvent.summary}</a>)
-        {nextEvent.location ? ` in ${nextEvent.location}` : ''}
+        {nextEvent.location ? <span> in <strong>{nextEvent.location}</strong></span> : ''}
       </p>
     </DIV>
   ) : '';

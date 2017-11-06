@@ -31,7 +31,7 @@ def get_free_and_busy_rooms(service):
         each['id']: each['summary']
         for each in calendars
     }
-    timemin = dt.datetime.utcnow().replace(tzinfo=pytz.utc)
+    now = dt.datetime.utcnow().replace(tzinfo=pytz.utc)
     timemax = (dt.datetime.utcnow() + dt.timedelta(hours=24)).replace(tzinfo=pytz.utc)
 
     primary_calendar = get_primary_calendar(calendar_list)
@@ -39,15 +39,19 @@ def get_free_and_busy_rooms(service):
         calendarId=primary_calendar['id'],
         orderBy='startTime',
         singleEvents=True,
-        timeMin=timemin.isoformat()
+        timeMin=now.isoformat()
     ).execute()['items']
     if primary_events:
         next_event = primary_events[0]
+        next_event_start = maya.parse(next_event['start']['dateTime']).datetime()
+        # You're in a meeting now. Take the next event
+        if next_event_start < now:
+            next_event = primary_events[1]
 
     free = []
     busy = []
     freebusy = service.freebusy().query(body={
-        'timeMin': timemin.isoformat(),
+        'timeMin': now.isoformat(),
         'timeMax': timemax.isoformat(),
         'items': calendars,
     }).execute()
