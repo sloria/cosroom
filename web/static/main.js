@@ -5,9 +5,11 @@ import {
   createSkeletonProvider,
   createSkeletonElement,
 } from '@trainline/react-skeletor';
+import microfeedback from 'microfeedback-button';
 
 import fetchJSON from './fetch-json';
 
+const MICROFEEDBACK_URL = 'https://cosroom-microfeedback.now.sh/';
 const images = {
   Aberto: '/static/images/aberto.jpg',
   Bukas: '/static/images/bukas.jpg',
@@ -337,5 +339,12 @@ class StatefulApp extends React.Component {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  microfeedback({
+    url: MICROFEEDBACK_URL,
+    onSubmit: () => {
+      // TODO: Improve this feedback
+      alert('Thanks for the feedback! A GitHub issue will be posted on the sloria/cosroom Issue Tracker.');
+    }
+  });
   render(<StatefulApp />, document.getElementById('app'));
 });

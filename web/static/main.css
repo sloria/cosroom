@@ -16,7 +16,7 @@ a {
   cursor: pointer;
   transition: .3s background-color;
 }
-a:hover {
+a.btn:hover {
   background-color: #a9f8fb;
 }
 
@@ -130,3 +130,47 @@ a.room-name:hover {
     border-radius: 4px;
     box-shadow: none;
 }
+
+/* Feedback button */
+.microfeedback-button, .microfeedback-dialog {
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+a.microfeedback-button:hover {
+  background-color: rgba(61, 194, 85, 0.8);
+}
+
+.microfeedback-dialog button {
+    font-family: inherit;
+    font-size: 100%;
+    padding: .5em 1em;
+    color: #444;
+    color: rgba(0,0,0,.8);
+    border: 1px solid #999;
+    border: transparent;
+    background-color: #E6E6E6;
+    text-decoration: none;
+    border-radius: 2px;
+
+    display: inline-block;
+    zoom: 1;
+    white-space: nowrap;
+    vertical-align: middle;
+    text-align: center;
+    cursor: pointer;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    box-sizing: border-box;
+    line-height: normal;
+    text-transform: none;
+    overflow: visible;
+}
+
+button.microfeedback-button-submit {
+  background-color: #007ea7;
+  color: #fff;
+}
+
