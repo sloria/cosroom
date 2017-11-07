@@ -170,12 +170,19 @@ function FreeList({ rooms, onClickRoom }) {
 }
 
 function NextEvent({ nextEvent }) {
+  const locations = nextEvent && nextEvent.location ? nextEvent.location.split(',') : [];
+  const linkifiedLocations = locations.map((each, i) => {
+    const location = each.trim();
+    const isLast = i === (locations.length - 1);
+    return location.startsWith('http') ?
+      <span><a href={location}>{location}</a>{ !isLast ? ', ' : '' }</span> : location + (!isLast ? ', ' : '');
+  });
   return nextEvent ? (
     <DIV className="NextEvent">
       <p>
         Your next meeting is in {distanceInWordsToNow(nextEvent.start.dateTime) + ' '}
         (<a href={nextEvent.htmlLink}>{nextEvent.summary}</a>)
-        {nextEvent.location ? <span> in <strong>{nextEvent.location}</strong></span> : ''}
+        {nextEvent.location ? <span> in <strong>{linkifiedLocations}</strong></span> : ''}
       </p>
     </DIV>
   ) : '';
