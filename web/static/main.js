@@ -5,6 +5,7 @@ import {
   createSkeletonProvider,
   createSkeletonElement,
 } from '@trainline/react-skeletor';
+import NProgress from 'nprogress';
 import microfeedback from 'microfeedback-button';
 
 import fetchJSON from './fetch-json';
@@ -314,8 +315,8 @@ class StatefulApp extends React.Component {
     this.handleClickRoom = this.handleClickRoom.bind(this);
   }
   update() {
-    this.setState({ loaded: false });
-    fetchJSON('/api/', { credentials: 'include' }).then(json => {
+    NProgress.start();
+    return fetchJSON('/api/', { credentials: 'include' }).then(json => {
       const free = json.free.map(each => new Room(each));
       const busy = json.busy.map(each => new Room(each));
       const nextEvent = json.next_event;
@@ -330,13 +331,19 @@ class StatefulApp extends React.Component {
         selectedRoom: room,
         selectedRoomFree: isFree,
       });
+      NProgress.done();
+    }).catch(() => {
+      NProgress.done();
+      this.setState({ loaded: true });
     });
   }
   componentDidMount() {
-    this.update();
-    this.ticker = window.setInterval(() => {
-      this.forceUpdate();
-    }, 10 * 1000);
+    this.setState({ loaded: false });
+    this.update().then(() => {
+      this.setState({ loaded: true });
+    });
+    // Force-update every 10 seconds to update relative teimes
+    this.ticker = window.setInterval(this.forceUpdate.bind(this), 10 * 1000);
   }
   componentWillUnmount() {
     this.ticker && window.clearInterval(this.ticker);
@@ -345,7 +352,10 @@ class StatefulApp extends React.Component {
     this.setState({ selectedRoom: room, selectedRoomFree: isFree });
   }
   handleUpdate() {
-    this.update();
+    this.setState({ loaded: false });
+    this.update().then(() => {
+      this.setState({ loaded: true });
+    });
   }
   render() {
     return (
