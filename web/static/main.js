@@ -34,8 +34,9 @@ const P = createSkeletonElement('p');
 const SPAN = createSkeletonElement('span');
 const DIV = createSkeletonElement('div');
 const H2 = createSkeletonElement('h2');
+const LI = createSkeletonElement('li');
 
-function Header() {
+function Header({ email }) {
   return (
     <header>
       <nav>
@@ -45,6 +46,7 @@ function Header() {
               Log out
             </a>
           </li>
+          <LI>{email}</LI>
         </ul>
       </nav>
     </header>
@@ -192,6 +194,7 @@ function App({
   free,
   busy,
   nextEvent,
+  email,
   lastUpdated,
   onUpdate,
   loaded,
@@ -202,7 +205,7 @@ function App({
   return (
     <div>
       <div className="content">
-        <Header />
+        <Header email={email} />
         <NextEvent nextEvent={nextEvent} />
         {selectedRoom ? (
           <FeaturedRoom
@@ -267,6 +270,7 @@ const dummyData = {
     start: { dateTime: new Date().toISOString() },
   },
   selectedRoom: createDummyRoom('5___'),
+  email: 'steve@cos.io',
 };
 
 const WrappedApp = createSkeletonProvider(
@@ -300,6 +304,8 @@ class StatefulApp extends React.Component {
     this.state = {
       free: [],
       busy: [],
+      nextEvent: null,
+      email: null,
       loaded: true,
       lastUpdated: null,
       selectedRoom: null,
@@ -318,6 +324,7 @@ class StatefulApp extends React.Component {
         free,
         busy,
         nextEvent,
+        email: json.email,
         lastUpdated: new Date(),
         loaded: true,
         selectedRoom: room,

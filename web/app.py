@@ -86,11 +86,12 @@ def get_service(error=False):
 @app.route('/api/')
 def api():
     service = get_service(error=True)
-    free, busy, next_event = get_free_and_busy_rooms(service)
+    free, busy, next_event, email = get_free_and_busy_rooms(service)
     return jsonify({
         'free': free,
         'busy': busy,
         'next_event': next_event,
+        'email': email,
     })
 
 def check_service(service):

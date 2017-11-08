@@ -88,7 +88,9 @@ nav ul {
 }
 
 nav ul li {
+  font-family: monospace;
   float: right;
+  padding-left: 10px;
 }
 
 .room-list {

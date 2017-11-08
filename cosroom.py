@@ -5,7 +5,7 @@ import pytz
 from urllib.parse import urlencode, quote_plus
 import maya
 
-RoomStates = namedtuple('RoomStates', ['free', 'busy', 'next_event'])
+RoomStates = namedtuple('RoomStates', ['free', 'busy', 'next_event', 'email'])
 
 
 def get_calendar_list(service):
@@ -26,7 +26,7 @@ def get_free_and_busy_rooms(service):
     calendar_list = get_calendar_list(service)
     calendars = get_room_calendars(calendar_list)
     if not calendars:
-        return RoomStates([], [], None)
+        return RoomStates([], [], None, None)
     room_ids = {
         each['id']: each['summary']
         for each in calendars
@@ -35,6 +35,7 @@ def get_free_and_busy_rooms(service):
     timemax = (dt.datetime.utcnow() + dt.timedelta(hours=24)).replace(tzinfo=pytz.utc)
 
     primary_calendar = get_primary_calendar(calendar_list)
+    email = primary_calendar['id']
     primary_events = service.events().list(
         calendarId=primary_calendar['id'],
         orderBy='startTime',
@@ -95,7 +96,7 @@ def get_free_and_busy_rooms(service):
             })
     free.sort(key=lambda each: each['name'])
     busy.sort(key=lambda each: each['name'])
-    return RoomStates(free, busy, next_event)
+    return RoomStates(free, busy, next_event, email)
 
 
 def create_event_url(
