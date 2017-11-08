@@ -48,6 +48,11 @@ function Header({ email }) {
             </a>
           </li>
           <LI>{email}</LI>
+          <li className="brand">
+            <a href="/">
+              COS Room Finder
+            </a>
+          </li>
         </ul>
       </nav>
     </header>

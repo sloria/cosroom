@@ -26,7 +26,7 @@ a.room-name {
 
 .btn {
   cursor: pointer;
-  font-family: monospace;
+  font: 13px Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
   text-transform: uppercase;
   text-decoration: none;
 }
@@ -83,12 +83,25 @@ a.room-name {
 
 nav ul {
   list-style: none;
+  padding-left: 0px;
   padding-bottom: 15px;
   margin: 0;
 }
 
+nav ul li.brand {
+  float: left;
+  padding-left: 0px;
+}
+
+.brand a {
+  text-decoration: none;
+}
+.brand a:hover {
+  background-color: #a9f8fb;
+}
+
 nav ul li {
-  font-family: monospace;
+  font: 13px Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
   float: right;
   padding-left: 10px;
 }
