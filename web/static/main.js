@@ -334,6 +334,12 @@ class StatefulApp extends React.Component {
   }
   componentDidMount() {
     this.update();
+    this.ticker = window.setInterval(() => {
+      this.forceUpdate();
+    }, 10 * 1000);
+  }
+  componentWillUnmount() {
+    this.ticker && window.clearInterval(this.ticker);
   }
   handleClickRoom(room, isFree) {
     this.setState({ selectedRoom: room, selectedRoomFree: isFree });
