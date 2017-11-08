@@ -180,7 +180,7 @@ function NextEvent({ nextEvent }) {
   return nextEvent ? (
     <DIV className="NextEvent">
       <p>
-        Your next meeting is in {distanceInWordsToNow(nextEvent.start.dateTime) + ' '}
+        Your next meeting is in <strong>{distanceInWordsToNow(nextEvent.start.dateTime) + ' '}</strong>
         (<a href={nextEvent.htmlLink}>{nextEvent.summary}</a>)
         {nextEvent.location ? <span> in <strong>{linkifiedLocations}</strong></span> : ''}
       </p>
@@ -201,8 +201,8 @@ function App({
 }) {
   return (
     <div>
-      <Header />
       <div className="content">
+        <Header />
         <NextEvent nextEvent={nextEvent} />
         {selectedRoom ? (
           <FeaturedRoom
@@ -350,7 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
     url: MICROFEEDBACK_URL,
     onSubmit: () => {
       // TODO: Improve this feedback
-      alert('Thanks for the feedback! A GitHub issue will be posted on the sloria/cosroom Issue Tracker.');
+      alert('Thanks for the feedback! An issue will be posted on the sloria/cosroom Issue Tracker on GitHub.');
     }
   });
   render(<StatefulApp />, document.getElementById('app'));

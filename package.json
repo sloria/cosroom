@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Find a room at COS",
   "author": "Steven Loria",
+  "repository": "sloria/cosroom",
   "scripts": {
     "build": "NODE_ENV=production webpack --progress --colors -p",
     "start": "concurrently -n \"WEBPACK,FLASK\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run webpack-dev-server\" \"npm run flask-server\"",
@@ -23,7 +24,7 @@
     "extract-text-webpack-plugin": "^2.1.2",
     "file-loader": "^0.11.2",
     "manifest-revision-webpack-plugin": "^0.4.0",
-    "microfeedback-button": "0.0.1",
+    "microfeedback-button": "0.1.0",
     "preact": "^8.2.5",
     "preact-compat": "^3.17.0",
     "raw-loader": "^0.5.1",
