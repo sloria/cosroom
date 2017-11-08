@@ -279,7 +279,7 @@ const dummyData = {
   email: 'steve@cos.io',
 };
 
-const WrappedApp = createSkeletonProvider(
+const AppWithSkeletons = createSkeletonProvider(
   props => (props.free.length || props.busy.length ? props : dummyData),
   // Whether to show skeleton screen
   props => !props.loaded,
@@ -364,7 +364,7 @@ class StatefulApp extends React.Component {
   }
   render() {
     return (
-      <WrappedApp
+      <AppWithSkeletons
         {...this.state}
         onClickRoom={this.handleClickRoom}
         onUpdate={this.handleUpdate}

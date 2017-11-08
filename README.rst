@@ -29,8 +29,7 @@ Development
   npm install npm@5
   npm install
 
-4. Create a ``.env`` file in this repo's directory and define the following
-environment variables:
+4. Create a ``.env`` file in this repo's directory and define the following environment variables:
 
 ::
 
