@@ -353,6 +353,13 @@ class StatefulApp extends React.Component {
   componentWillUnmount() {
     this.ticker && window.clearInterval(this.ticker);
   }
+  componentDidUpdate() {
+    // If the next event's start time has already passed, we need to
+    // fetch new data
+    if (new Date(this.state.nextEvent.start.dateTime) < new Date()) {
+      this.update();
+    }
+  }
   handleClickRoom(room, isFree) {
     this.setState({ selectedRoom: room, selectedRoomFree: isFree });
   }
