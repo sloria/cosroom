@@ -386,7 +386,9 @@ document.addEventListener('DOMContentLoaded', () => {
     onSubmit: () => {
       // TODO: Improve this feedback
       alert('Thanks for the feedback! An issue will be posted on the sloria/cosroom Issue Tracker on GitHub.');
-    }
+    },
+    placeholder: 'Report a bug, share an idea, or just say thanks',
+    help: '<small>Powered by <a href="https://github.com/microfeedback/">MicroFeedback</a></small>'
   });
   render(<StatefulApp />, document.getElementById('app'));
 });

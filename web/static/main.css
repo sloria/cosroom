@@ -151,6 +151,10 @@ a.room-name:hover {
   font-family: 'Helvetica Neue', sans-serif;
 }
 
+.microfeedback-help small {
+  font-size: 0.7em;
+}
+
 
 /* Progress bar */
 #nprogress {
