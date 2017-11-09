@@ -10,7 +10,8 @@
     "webpack-dev-server": "NODE_ENV=debug webpack-dev-server --port 2992 --hot --inline",
     "flask-server": "FLASK_APP=web/app.py FLASK_DEBUG=1 flask run",
     "lint": "eslint \"web/static/*.js\"",
-    "heroku-postbuild": "npm run build"
+    "heroku-postbuild": "npm run build",
+    "deploy": "git push heroku master"
   },
   "license": "MIT",
   "dependencies": {

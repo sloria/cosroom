@@ -4,4 +4,4 @@ Releasing
 
 ::
 
-  git push heroku master
+  npm run deploy
