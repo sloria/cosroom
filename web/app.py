@@ -1,7 +1,6 @@
 #!/usr/bin/python2.7
 import os
 from collections import namedtuple
-import logging
 
 import environs
 import httplib2
@@ -15,7 +14,6 @@ from cosroom import get_free_and_busy_rooms
 from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
 
-logger = logging.getLogger(__name__)
 env = environs.Env()
 # Read .env file
 if os.path.isfile('.env'):
@@ -65,7 +63,7 @@ def oauth2callback():
         try:
             credentials = flow.step2_exchange(code)
         except Exception:
-            logger.exception('Error occurred during OAuth flow')
+            app.logger.exception('Error occurred during OAuth flow')
             abort(400)
         session['credentials'] = credentials.to_json()
 
@@ -77,10 +75,13 @@ def get_service(error=False):
             abort(401)
         else:
             return False
-    credentials = client.Credentials.new_from_json(session['credentials'])
-    http = httplib2.Http()
-    http = credentials.authorize(http)
-    service = build('calendar', 'v3', http=http)
+    try:
+        credentials = client.Credentials.new_from_json(session['credentials'])
+        http = httplib2.Http()
+        http = credentials.authorize(http)
+        service = build('calendar', 'v3', http=http)
+    except Exception:
+        abort(401)
     return service
 
 @app.route('/api/')
@@ -114,6 +115,19 @@ def index():
 def logout():
     session['credentials'] = None
     return render_template('logout.html', DEBUG=DEBUG)
+
+@app.errorhandler(401)
+def unauthorized(error):
+    return jsonify({
+        'message': 'Authentication credentials invalid or not provided'
+    }), 401
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    app.logger.error(error)
+    return jsonify({
+        'message': 'An unexpected error occurred'
+    }), 500
 
 
 if __name__ == '__main__':

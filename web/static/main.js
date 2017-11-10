@@ -337,9 +337,14 @@ class StatefulApp extends React.Component {
         selectedRoomFree: isFree,
       });
       NProgress.done();
-    }).catch(() => {
+    }).catch(({ response }) => {
       NProgress.done();
       this.setState({ loaded: true });
+      // Credentials expired
+      if (response.status === 401) {
+        // need to re-auth
+        window.location.reload(false);
+      }
     });
   }
   componentDidMount() {
@@ -347,16 +352,17 @@ class StatefulApp extends React.Component {
     this.update().then(() => {
       this.setState({ loaded: true });
     });
-    // Force-update every 10 seconds to update relative teimes
+    // Force a render every 10 seconds to update relative times
     this.ticker = window.setInterval(this.forceUpdate.bind(this), 10 * 1000);
   }
   componentWillUnmount() {
     this.ticker && window.clearInterval(this.ticker);
   }
   componentDidUpdate() {
+    const { nextEvent } = this.state;
     // If the next event's start time has already passed, we need to
     // fetch new data
-    if (new Date(this.state.nextEvent.start.dateTime) < new Date()) {
+    if (nextEvent && new Date(nextEvent.start.dateTime) < new Date()) {
       this.update();
     }
   }
