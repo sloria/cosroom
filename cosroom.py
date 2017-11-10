@@ -8,8 +8,38 @@ import maya
 RoomStates = namedtuple('RoomStates', ['free', 'busy', 'next_event', 'email'])
 
 
+KNOWN_ROOMS = {
+    'aberto',
+    'aperi',
+    'bukas',
+    'furan',
+    'offnen',
+    'opfice',
+    'Phone Booth 1',
+    'Phone Booth 2',
+    'Phone Booth 3',
+    'Phone Booth 4',
+    'Phone Booth 5',
+    'Phone Booth 6',
+}
+
+
 def get_calendar_list(service):
-    return service.calendarList().list().execute()['items']
+    request = service.calendarList().list(showHidden=True)
+    response = request.execute()
+    calendars = response['items']
+    has_more = bool(response.get('nextPageToken'))
+    while has_more:
+        request = service.calendarList().list_next(
+            previous_request=request,
+            previous_response=response
+        )
+        response = request.execute()
+        calendars.extend(response['items'])
+        if not response.get('nextPageToken'):
+            has_more = False
+    return calendars
+
 
 def get_primary_calendar(calendar_list):
     return next(
@@ -19,7 +49,10 @@ def get_primary_calendar(calendar_list):
 def get_room_calendars(calendar_list):
     return [
         calendar for calendar in calendar_list
-        if calendar.get('accessRole') == 'freeBusyReader'
+        if calendar.get('accessRole') == 'freeBusyReader' or
+        # Not all room calendars have the freeBusyReader access role,
+        # so we need this additional check
+        calendar.get('summary').lower() in KNOWN_ROOMS
     ]
 
 def get_free_and_busy_rooms(service):
