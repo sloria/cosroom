@@ -241,7 +241,7 @@ function App({
           <a
             rel="noopener noreferrer"
             target="_blank"
-            href="https://gist.github.com/sloria/12f7e0dfc6e5d1c6c480bbe5f1f3cb15"
+            href="https://calendar.google.com/calendar/b/1/r/settings/browseresources"
           >
             Add more rooms
           </a>
