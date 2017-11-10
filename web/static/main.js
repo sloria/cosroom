@@ -10,7 +10,7 @@ import microfeedback from 'microfeedback-button';
 
 import fetchJSON from './fetch-json';
 
-const MICROFEEDBACK_URL = 'https://cosroom-microfeedback.now.sh/';
+const MICROFEEDBACK_URL = 'https://microfeedback-github.now.sh/sloria/cosroom';
 const images = {
   Aberto: '/static/images/aberto.jpg',
   Bukas: '/static/images/bukas.jpg',
@@ -394,7 +394,10 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Thanks for the feedback! An issue will be posted on the sloria/cosroom Issue Tracker on GitHub.');
     },
     placeholder: 'Report a bug, share an idea, or just say thanks',
-    help: '<small>Powered by <a href="https://github.com/microfeedback/">MicroFeedback</a></small>'
+    help: `
+    <small>
+      Your feedback will be posted on the <a target="_blank" href="https://github.com/sloria/cosroom/issues">sloria/cosroom Issue Tracker</a>
+    </small>`,
   });
   render(<StatefulApp />, document.getElementById('app'));
 });
