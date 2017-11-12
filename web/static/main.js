@@ -196,6 +196,13 @@ function NextEvent({ nextEvent }) {
   ) : '';
 }
 
+
+const Error = () => (
+  <div>
+    An unexpected error occurred. Go bug Steve about it.
+  </div>
+)
+
 function App({
   free,
   busy,
@@ -207,7 +214,13 @@ function App({
   onClickRoom,
   selectedRoom,
   selectedRoomFree,
+  error,
 }) {
+  if (error) {
+    console.error(error);  // eslint-disable-line
+    return <Error error={error} />;
+  }
+
   return (
     <div>
       <div className="content">
@@ -315,6 +328,7 @@ class StatefulApp extends React.Component {
       loaded: true,
       lastUpdated: null,
       selectedRoom: null,
+      error: null,
     };
     this.handleUpdate = this.handleUpdate.bind(this);
     this.handleClickRoom = this.handleClickRoom.bind(this);
@@ -337,14 +351,15 @@ class StatefulApp extends React.Component {
         selectedRoomFree: isFree,
       });
       NProgress.done();
-    }).catch(({ response }) => {
+    }).catch((error) => {
+      const { response } = error;
       NProgress.done();
-      this.setState({ loaded: true });
       // Credentials expired
       if (response.status === 401) {
         // need to re-auth
         window.location.reload(false);
       }
+      this.setState({ loaded: true, error });
     });
   }
   componentDidMount() {
