@@ -7,7 +7,6 @@ import maya
 
 RoomStates = namedtuple('RoomStates', ['free', 'busy', 'next_event', 'email'])
 
-
 KNOWN_ROOMS = {
     'aberto',
     'aperi',
@@ -22,6 +21,11 @@ KNOWN_ROOMS = {
     'Phone Booth 5',
     'Phone Booth 6',
 }
+# Many people have both their COS account as their secondary
+# account. Therefore, "reserve" links will go to the second (index 1)
+# account by default. If there is no secondary account, Google will redirect
+# to the primary account
+DEFAULT_ACCOUNT_INDEX = 1
 
 
 def get_calendar_list(service):
@@ -104,7 +108,8 @@ def get_free_and_busy_rooms(service):
                     'until': next_busy['end'],
                     'create_url': create_event_url(calendar_id,
                                                    start=end_dt,
-                                                   end=end_dt + dt.timedelta(seconds=15 * 60)),
+                                                   end=end_dt + dt.timedelta(seconds=15 * 60),
+                                                   account_index=DEFAULT_ACCOUNT_INDEX),
                 })
             else:
                 # If the room is free for over and hour, create URL will
@@ -117,7 +122,10 @@ def get_free_and_busy_rooms(service):
                     'id': calendar_id,
                     'name': room_name,
                     'until': next_busy['start'],
-                    'create_url': create_event_url(calendar_id, start=now, end=create_url_end),
+                    'create_url': create_event_url(calendar_id,
+                                                   start=now,
+                                                   end=create_url_end,
+                                                   account_index=DEFAULT_ACCOUNT_INDEX),
                 })
         else:
             # Create URL will default to a 15-min time slot
@@ -125,7 +133,10 @@ def get_free_and_busy_rooms(service):
             free.append({
                 'id': calendar_id,
                 'name': room_name,
-                'create_url': create_event_url(calendar_id, start=now, end=create_url_end),
+                'create_url': create_event_url(calendar_id,
+                                               start=now,
+                                               end=create_url_end,
+                                               account_index=DEFAULT_ACCOUNT_INDEX),
             })
     free.sort(key=lambda each: each['name'])
     busy.sort(key=lambda each: each['name'])
@@ -138,10 +149,11 @@ def create_event_url(
     end=None,
     text='busy',
     description=None,
+    account_index=0,
 ):
     """Build URL for creating a new event, reserving the room with the given calendar_id."""
     dt_format = '%Y%m%dT%H%M%SZ'
-    base_url = 'https://calendar.google.com/calendar/render'
+    base_url = 'https://calendar.google.com/calendar/b/{}/render'.format(account_index)
     start = start or dt.datetime.utcnow().replace(tzinfo=pytz.utc)
     end = end or start + dt.timedelta(seconds=15 * 60)
     params = {
