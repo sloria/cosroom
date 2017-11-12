@@ -112,7 +112,7 @@ def get_free_and_busy_rooms(service):
                                                    account_index=DEFAULT_ACCOUNT_INDEX),
                 })
             else:
-                # If the room is free for over and hour, create URL will
+                # If the room is free for over an hour, create URL will
                 # default to a 15-min time slot
                 if (start_dt - now).total_seconds() > 60 * 60:
                     create_url_end = now + dt.timedelta(seconds=15 * 60)

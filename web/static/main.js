@@ -374,10 +374,13 @@ class StatefulApp extends React.Component {
     this.ticker && window.clearInterval(this.ticker);
   }
   componentDidUpdate() {
-    const { nextEvent } = this.state;
-    // If the next event's start time has already passed, we need to
-    // fetch new data
-    if (nextEvent && new Date(nextEvent.start.dateTime) < new Date()) {
+    const { free, busy, nextEvent } = this.state;
+    // If any of the start times are expired, we need to force a refresh
+    const now = new Date();
+    const nextEventNeedsUpdate = nextEvent && new Date(nextEvent.start.dateTime) < now;
+    const freeRoomsNeedUpdate = free.length && free.filter(room => new Date(room.until) < now).length;
+    const busyRoomsNeedUpdate = busy.length && busy.filter(room => new Date(room.until) < now).length;
+    if (nextEventNeedsUpdate || freeRoomsNeedUpdate || busyRoomsNeedUpdate) {
       this.update();
     }
   }
