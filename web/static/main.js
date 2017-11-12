@@ -1,6 +1,7 @@
 import React from 'react';
 import { render } from 'react-dom';
 import distanceInWordsToNow from 'date-fns/distance_in_words_to_now';
+import addMinutes from 'date-fns/add_minutes';
 import {
   createSkeletonProvider,
   createSkeletonElement,
@@ -302,15 +303,27 @@ const AppWithSkeletons = createSkeletonProvider(
 )(App);
 
 function selectFeatured(free, busy) {
+  const fifteenMinFromNow = addMinutes(new Date(), 15);
   // Choose a random room that is not a phone booth
   const mainFreeRooms = free.filter(rm => !rm.name.startsWith('Phone Booth'));
   const mainBusyRooms = busy.filter(rm => !rm.name.startsWith('Phone Booth'));
+
+  const bestFreeRooms = mainFreeRooms.filter(rm => new Date(rm.until) >= fifteenMinFromNow);
+  const bestBusyRooms = mainBusyRooms.filter(rm => new Date(rm.until) <= fifteenMinFromNow);
+
   let featured = null;
   let isFree = false;
-  if (mainFreeRooms.length) {
+  // First try rooms that are free for at least 15 minutes
+  if (bestFreeRooms.length) {
+    featured = randomChoice(bestFreeRooms);
+    isFree = true;
+  } else if (mainFreeRooms.length) { // Then try any other free rooms
     featured = randomChoice(mainFreeRooms);
     isFree = true;
-  } else if (mainBusyRooms.length) {
+  } else if (bestBusyRooms.length) { // then try busy rooms that will be free soon
+    featured = randomChoice(bestBusyRooms);
+    isFree = false;
+  } else if (mainBusyRooms.length) { // then try any other busy rooms
     featured = randomChoice(mainBusyRooms);
     isFree = false;
   }
