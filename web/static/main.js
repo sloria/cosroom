@@ -362,6 +362,7 @@ class StatefulApp extends React.Component {
         loaded: true,
         selectedRoom: room,
         selectedRoomFree: isFree,
+        error: null,
       });
       NProgress.done();
     }).catch((error) => {
@@ -387,13 +388,13 @@ class StatefulApp extends React.Component {
     this.ticker && window.clearInterval(this.ticker);
   }
   componentDidUpdate() {
-    const { free, busy, nextEvent } = this.state;
+    const { free, busy, nextEvent, error } = this.state;
     // If any of the start times are expired, we need to force a refresh
     const now = new Date();
     const nextEventNeedsUpdate = nextEvent && new Date(nextEvent.start.dateTime) < now;
     const freeRoomsNeedUpdate = free.length && free.filter(room => new Date(room.until) < now).length;
     const busyRoomsNeedUpdate = busy.length && busy.filter(room => new Date(room.until) < now).length;
-    if (nextEventNeedsUpdate || freeRoomsNeedUpdate || busyRoomsNeedUpdate) {
+    if (!error && nextEventNeedsUpdate || freeRoomsNeedUpdate || busyRoomsNeedUpdate) {
       this.update();
     }
   }

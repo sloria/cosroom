@@ -87,7 +87,10 @@ def get_service(error=False):
 @app.route('/api/')
 def api():
     service = get_service(error=True)
-    free, busy, next_event, email = get_free_and_busy_rooms(service)
+    try:
+        free, busy, next_event, email = get_free_and_busy_rooms(service)
+    except client.Error:
+        abort(401)
     return jsonify({
         'free': free,
         'busy': busy,
