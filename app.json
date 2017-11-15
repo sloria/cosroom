@@ -1,0 +1,25 @@
+{
+  "name": "COS Room Finder",
+  "description": "Find a room at COS",
+  "repository": "https://github.com/sloria/cosroom",
+  "env": {
+    "SECRET_KEY": {"generator": "secret", "required": true},
+    "CLIENT_ID":  {
+      "description": "Google API client ID",
+      "required": true
+    },
+    "CLIENT_SECRET": {
+      "description": "Google API client secret",
+      "required": true
+    },
+    "REDIRECT_URI": {
+      "description": "Oauth redirect URI",
+      "value": "http://rooms.sloria.com/callback",
+      "required": true
+    }
+  },
+  "buildpacks": [
+    {"url": "heroku/python"},
+    {"url": "heroku/nodejs"}
+  ]
+}
