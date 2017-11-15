@@ -79,13 +79,28 @@ def get_free_and_busy_rooms(service):
         singleEvents=True,
         timeMin=now.isoformat()
     ).execute()['items']
-    if primary_events:
-        next_event = primary_events[0]
-        next_event_start = maya.parse(next_event['start']['dateTime']).datetime()
-        # You're in a meeting now. Take the next event
-        if next_event_start < now:
-            next_event = primary_events[1]
 
+    if primary_events:
+        next_event = None
+        # Find the next event
+        for event in primary_events:
+            # Skip all day events
+            if 'dateTime' not in event['start']:  # all day event
+                continue
+            next_event = event
+            next_event_start = maya.parse(next_event['start']['dateTime']).datetime()
+            # In a meeting now. Go to next event
+            if next_event_start < now:
+                continue
+            # Declined event
+            elif next_event.get('attendees') and any([
+                    each.get('responseStatus') == 'declined'
+                    for each in next_event['attendees']
+                    if each['email'] == email]):
+                continue
+            # Found next event
+            else:
+                break
     free = []
     busy = []
     freebusy = service.freebusy().query(body={
