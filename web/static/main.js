@@ -394,7 +394,7 @@ class StatefulApp extends React.Component {
     const nextEventNeedsUpdate = nextEvent && new Date(nextEvent.start.dateTime) < now;
     const freeRoomsNeedUpdate = free.length && free.filter(room => new Date(room.until) < now).length;
     const busyRoomsNeedUpdate = busy.length && busy.filter(room => new Date(room.until) < now).length;
-    if (!error && nextEventNeedsUpdate || freeRoomsNeedUpdate || busyRoomsNeedUpdate) {
+    if (!error && (nextEventNeedsUpdate || freeRoomsNeedUpdate || busyRoomsNeedUpdate)) {
       this.update();
     }
   }
