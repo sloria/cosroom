@@ -46,7 +46,7 @@ Then run the following command:
 
 ::
 
-  npm start
+  npm run dev
 
 
 Browse to http://localhost:5000 to view the app.
