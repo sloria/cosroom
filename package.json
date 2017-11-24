@@ -5,10 +5,11 @@
   "author": "Steven Loria",
   "repository": "sloria/cosroom",
   "scripts": {
+    "test": "npm run lint && jest",
     "build": "NODE_ENV=production webpack --progress --colors -p",
-    "dev": "concurrently -n \"WEBPACK,FLASK\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run webpack-dev-server\" \"npm run server\"",
+    "dev": "concurrently -n \"WEBPACK,FLASK\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run webpack-dev-server\" \"npm run flask\"",
     "webpack-dev-server": "NODE_ENV=debug webpack-dev-server --port 2992 --hot --inline",
-    "server": "FLASK_APP=web/app.py FLASK_DEBUG=1 flask run",
+    "flask": "FLASK_APP=web/app.py FLASK_DEBUG=1 flask run",
     "lint": "eslint \"web/static/*.js\"",
     "heroku-postbuild": "npm run build",
     "deploy": "git push heroku master"
@@ -36,15 +37,23 @@
     "webpack": "^2.6.1"
   },
   "engines": {
-    "node": "8.1.x",
+    "node": "8.9.x",
     "npm": "5.4.x"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
+    "babel-jest": "^21.2.0",
     "concurrently": "^3.5.0",
     "eslint": "^3.19.0",
     "eslint-plugin-import": "^2.3.0",
     "eslint-plugin-react": "^7.4.0",
+    "jest": "^21.2.1",
     "webpack-dev-server": "^2.4.5"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^react$": "preact-compat",
+      "^react-dom$": "preact-compat"
+    }
   }
 }
