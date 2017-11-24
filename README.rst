@@ -50,3 +50,8 @@ Then run the following command:
 
 
 Browse to http://localhost:5000 to view the app.
+
+
+.. image:: https://badges.greenkeeper.io/sloria/cosroom.svg
+   :alt: Greenkeeper badge
+   :target: https://greenkeeper.io/
