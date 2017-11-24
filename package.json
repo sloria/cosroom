@@ -12,7 +12,7 @@
     "flask": "FLASK_APP=web/app.py FLASK_DEBUG=1 flask run",
     "lint": "eslint \"web/static/*.js\"",
     "heroku-postbuild": "npm run build",
-    "deploy": "git push heroku master"
+    "deploy": "npm test && git push heroku master"
   },
   "license": "MIT",
   "dependencies": {
