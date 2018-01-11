@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^8.0.2",
-    "babel-jest": "^21.2.0",
+    "babel-jest": "^22.0.0",
     "concurrently": "^3.5.0",
     "eslint": "^4.11.0",
     "eslint-plugin-import": "^2.3.0",
