@@ -385,15 +385,18 @@ export default class StatefulApp extends React.Component {
     // Feedback button
     microfeedback({
       url: MICROFEEDBACK_URL,
-      onSubmit: () => {
-        // TODO: Improve this feedback
-        alert('Thanks for the feedback! An issue will be posted on the sloria/cosroom Issue Tracker on GitHub.');
-      },
+      html: '<small>Your feedback will be posted to the <br><a target="_blank" rel="noopener noreferrer" href="https://github.com/sloria/cosroom/issues">sloria/cosroom Issue Tracker</a></small>',
       placeholder: 'Report a bug, share an idea, or just say thanks',
-      help: `
-      <small>
-        Your feedback will be posted on the <a target="_blank" href="https://github.com/sloria/cosroom/issues">sloria/cosroom Issue Tracker</a>
-      </small>`,
+      optimistic: false,
+      showSuccessDialog(btn, input, response) {
+        return btn.alert('Thanks!', `Your issue has been posted here:<br>
+          <a target="_blank" rel="noopener noreferrer" href="${response.result.html_url}">
+            ${response.result.html_url}
+          </a>`, 'success');
+      },
+      onFailure(btn) {
+        return btn.alert('Oops!', 'Something went wrong…Go tell Steve.', 'error');
+      }
     });
   }
   componentWillUnmount() {

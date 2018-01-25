@@ -146,16 +146,6 @@ a.room-name:hover {
     box-shadow: none;
 }
 
-/* Feedback button */
-.microfeedback-button, .microfeedback-dialog {
-  font-family: 'Helvetica Neue', sans-serif;
-}
-
-.microfeedback-help small {
-  font-size: 0.7em;
-}
-
-
 /* Progress bar */
 #nprogress {
   pointer-events: none;
