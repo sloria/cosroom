@@ -67,25 +67,31 @@ function FeaturedRoom({ room, loaded, free }) {
   if (loaded && room.image) {
     style.backgroundImage = `url("${room.image}")`;
   }
+
+  const FeaturedWrapper = (
+    loaded ? A : DIV
+  );
   return (
     <div>
       <H2 className="featured-alt visible-sm">
         {room.name} is available
         {room.until ? <span> for {distanceInWordsToNow(room.until)}</span> : ''}
       </H2>
-      <DIV className="featured-image hidden-sm" style={style}>
-        <H2 className="featured">
-          {room.name} {free ? 'is available' : 'will be available'}
-          {room.until ? (
-            <span>
-              {' '}
-              {free ? 'for' : 'in'} {distanceInWordsToNow(room.until)}
-            </span>
-          ) : (
-            ''
-          )}
-        </H2>
-      </DIV>
+      <FeaturedWrapper class="featured-image" href={room.createURL}>
+        <DIV className="featured-image--display hidden-sm" style={style}>
+          <H2 className="featured">
+            {room.name} {free ? 'is available' : 'will be available'}
+            {room.until ? (
+              <span>
+                {' '}
+                {free ? 'for' : 'in'} {distanceInWordsToNow(room.until)}
+              </span>
+            ) : (
+              ''
+            )}
+          </H2>
+        </DIV>
+      </FeaturedWrapper>
       <div>
         <A className="btn" href={room.createURL} title={`Reserve ${room.name}`}>
           Reserve {free ? 'now' : 'next opening'}
@@ -95,7 +101,8 @@ function FeaturedRoom({ room, loaded, free }) {
   );
 }
 
-function BusyList({ rooms, onClickRoom }) {
+function BusyList({ rooms, onClickRoom, loaded }) {
+  const LinkElem = loaded ? A : DIV;
   const roomsElem = rooms.length
     ? rooms.map(room => {
         const roomName =
@@ -117,13 +124,14 @@ function BusyList({ rooms, onClickRoom }) {
             ) : (
               ''
             )}
-            <A
+            <LinkElem
               className="btn btn-room-list"
               href={room.createURL}
               title={`Reserve ${room.name}`}
+              style={loaded ? {} : {cursor: 'auto'}}
             >
               Reserve next opening
-            </A>
+            </LinkElem>
           </li>
         );
       })
@@ -136,7 +144,8 @@ function BusyList({ rooms, onClickRoom }) {
   );
 }
 
-function FreeList({ rooms, onClickRoom }) {
+function FreeList({ rooms, onClickRoom, loaded }) {
+  const LinkElem = loaded ? A : DIV;
   const roomsElem = rooms.length
     ? rooms.map(room => {
         const roomName =
@@ -158,13 +167,14 @@ function FreeList({ rooms, onClickRoom }) {
             ) : (
               ''
             )}
-            <A
+            <LinkElem
               className="btn btn-room-list"
               href={room.createURL}
               title={`Reserve ${room.name}`}
+              style={loaded ? {} : {cursor: 'auto'}}
             >
               Reserve now
-            </A>
+            </LinkElem>
           </li>
         );
       })

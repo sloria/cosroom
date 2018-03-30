@@ -37,7 +37,11 @@ a.room-name {
   content: ']';
 }
 
-.featured-image {
+a.featured-image {
+  text-decoration: none;
+}
+
+.featured-image--display {
   max-width: 100% !important;
   height: auto;
   box-shadow: 8px 8px 10px #aaa;
