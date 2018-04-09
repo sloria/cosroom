@@ -34,7 +34,7 @@ module.exports = {
   },
   devtool: 'source-map',
   module: {
-    loaders: [
+    rules: [
       { test: /\.html$/, loader: 'raw-loader' },
       { test: /\.css$/, loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader' }) },
       { test: /\.(ttf|eot|svg|png|jpe?g|gif|ico)(\?.*)?$/i,
