@@ -36,7 +36,7 @@
     "webpack": "^4.5.0"
   },
   "engines": {
-    "node": "8.9.x",
+    "node": "10",
     "npm": "5.4.x"
   },
   "devDependencies": {
