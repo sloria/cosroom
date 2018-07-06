@@ -5,7 +5,7 @@
   "author": "Steven Loria",
   "repository": "sloria/cosroom",
   "scripts": {
-    "test": "npm run lint && jest",
+    "test": "npm run lint && pytest && jest",
     "build": "NODE_ENV=production webpack --progress --colors -p",
     "dev": "concurrently -n \"WEBPACK,FLASK\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run webpack-dev-server\" \"npm run flask\"",
     "webpack-dev-server": "NODE_ENV=debug webpack-dev-server --port 2992 --hot --inline",

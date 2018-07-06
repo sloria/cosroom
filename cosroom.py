@@ -1,3 +1,4 @@
+from email.utils import parseaddr
 import datetime as dt
 from collections import namedtuple
 
@@ -5,7 +6,7 @@ import pytz
 from urllib.parse import urlencode, quote_plus
 import maya
 
-RoomStates = namedtuple("RoomStates", ["free", "busy", "next_event", "email"])
+RoomStates = namedtuple("RoomStates", ["free", "busy", "pairs", "next_event", "email"])
 
 KNOWN_ROOMS = {
     "aberto",
@@ -57,6 +58,80 @@ def get_room_calendars(calendar_list):
         # so we need this additional check
         calendar.get("summary").lower() in KNOWN_ROOMS
     ]
+
+
+# naive implementation, but fine for our purposes
+def is_email(s):
+    return s and bool(parseaddr(s)[1])
+
+
+def is_person_calendar(calendar):
+    return (
+        # it's not a room
+        calendar.get("accessRole") == "reader"
+        and
+        # its id is an email address
+        is_email(calendar.get("id"))
+        and
+        # its not the COS calendar
+        calendar.get("id") != "calendar@cos.io"
+        and
+        # not a shared event calendar
+        "group.calendar.google.com" not in calendar.get("id")
+        and
+        # its actively selected
+        calendar.get("selected", False)
+    )
+
+
+def get_people_calendars(calendar_list):
+    return [calendar for calendar in calendar_list if is_person_calendar(calendar)]
+
+
+def get_next_weekday():
+    """Return the next weekday as a datetime. If it's already a weekday right now,
+    return the current datetime.
+    """
+    ret = now = dt.datetime.utcnow().replace(tzinfo=pytz.utc)
+    if now.weekday() >= 5:  # It's the weekend
+        ret = ret.replace(hour=0, minute=0, second=0)
+        while ret.weekday() >= 5:
+            ret += dt.timedelta(days=1)
+    return ret
+
+
+def get_pairing_events(service, calendar):
+    # Optimization: Only search for events during weekdays
+    timemin = get_next_weekday()
+    events = (
+        service.events()
+        .list(
+            calendarId=calendar["id"],
+            orderBy="startTime",
+            singleEvents=True,
+            timeMin=timemin.isoformat(),
+            maxResults=20,
+            # TODO: Add timeMax
+            # TODO: refine search?
+            # 'available pair' does not match "available for pairing"
+            q="available",
+        )
+        .execute()["items"]
+    )
+    return events
+
+
+def get_available_pairs(service, calendar_list=None):
+    ret = {}
+    calendar_list = (
+        get_calendar_list(service) if calendar_list is None else calendar_list
+    )
+    calendars = get_people_calendars(calendar_list)
+    for calendar in calendars:
+        pairing_events = get_pairing_events(service, calendar)
+        if pairing_events:
+            ret[calendar["id"]] = pairing_events
+    return ret
 
 
 def get_free_and_busy_rooms(service):
@@ -180,7 +255,8 @@ def get_free_and_busy_rooms(service):
             )
     free.sort(key=lambda each: each["name"])
     busy.sort(key=lambda each: each["name"])
-    return RoomStates(free, busy, next_event, email)
+    pairs = get_available_pairs(service, calendar_list=calendar_list)
+    return RoomStates(free, busy, pairs, next_event, email)
 
 
 def create_event_url(

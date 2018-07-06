@@ -99,11 +99,17 @@ def get_service(error=False):
 def api():
     service = get_service(error=True)
     try:
-        free, busy, next_event, email = get_free_and_busy_rooms(service)
+        free, busy, pairs, next_event, email = get_free_and_busy_rooms(service)
     except client.Error:
         abort(401)
     return jsonify(
-        {"free": free, "busy": busy, "next_event": next_event, "email": email}
+        {
+            "free": free,
+            "busy": busy,
+            "next_event": next_event,
+            "email": email,
+            "pairs": pairs,
+        }
     )
 
 

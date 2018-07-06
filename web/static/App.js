@@ -20,12 +20,24 @@ const images = {
   Furan: "/static/images/furan.jpg"
 };
 
+const nameReplacements = {
+  "pattison.dawn": "Dawn"
+};
+
 function Room(data) {
   this.createURL = data.create_url;
   this.name = data.name;
   this.id = data.id;
   this.until = data.until;
   this.image = images[data.name];
+}
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function getNameFromEmail(s) {
+  const base = s.split("@")[0];
+  return nameReplacements[base] || capitalizeFirstLetter(base);
 }
 
 const STRONG = createSkeletonElement("strong");
@@ -218,6 +230,33 @@ function NextEvent({ nextEvent }) {
   );
 }
 
+function PairList({ pairs }) {
+  return (
+    <div>
+      {Object.keys(pairs).length ? <h3>Need a partner?</h3> : ""}
+      <ul className="room-list">
+        {Object.entries(pairs).map(([key, value]) => {
+          const next = value[0];
+          const distance = distanceInWordsToNow(next.start.dateTime);
+          const name = getNameFromEmail(key);
+          return (
+            <li key={key}>
+              <strong>{name}</strong> is available to pair in {distance}.
+              <A
+                className="btn btn-room-list"
+                href=""
+                title={`Pair with ${name}`}
+              >
+                Pair
+              </A>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
 const Error = () => (
   <div>An unexpected error occurred. Go bug Steve about it.</div>
 );
@@ -225,6 +264,7 @@ const Error = () => (
 export function App({
   free,
   busy,
+  pairs,
   nextEvent,
   email,
   lastUpdated,
@@ -254,6 +294,7 @@ export function App({
         ) : (
           ""
         )}
+        {Object.keys(pairs).length ? <PairList pairs={pairs} /> : ""}
         {free.length ? (
           <FreeList
             selectedRoom={selectedRoom}
@@ -303,6 +344,7 @@ export const createDummyRoom = name =>
 export const dummyData = {
   free: [createDummyRoom("1___"), createDummyRoom("2___")],
   busy: [createDummyRoom("3____"), createDummyRoom("4____")],
+  pairs: [],
   nextEvent: {
     summary: "abcdefg",
     start: { dateTime: new Date().toISOString() }
@@ -361,6 +403,7 @@ export default class StatefulApp extends React.Component {
     this.state = {
       free: [],
       busy: [],
+      pairs: {},
       nextEvent: null,
       email: null,
       loaded: true,
@@ -377,11 +420,13 @@ export default class StatefulApp extends React.Component {
       .then(json => {
         const free = json.free.map(each => new Room(each));
         const busy = json.busy.map(each => new Room(each));
+        const pairs = json.pairs;
         const nextEvent = json.next_event;
         const { room, isFree } = selectFeatured(free, busy);
         this.setState({
           free,
           busy,
+          pairs,
           nextEvent,
           email: json.email,
           lastUpdated: new Date(),

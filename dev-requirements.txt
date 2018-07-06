@@ -2,3 +2,5 @@
 
 flake8==3.5.0
 pre-commit==1.10.3
+pytest==3.6.3
+freezegun-0.3.10
