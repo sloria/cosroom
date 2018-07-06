@@ -87,6 +87,9 @@ def get_free_and_busy_rooms(service):
             # Skip all day events
             if 'dateTime' not in event['start']:  # all day event
                 continue
+            # Skip events where you've marked yourself Available
+            if event.get('transparency') == 'transparent':
+                continue
             next_event = event
             next_event_start = maya.parse(next_event['start']['dateTime']).datetime()
             # In a meeting now. Go to next event
