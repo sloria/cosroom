@@ -1,4 +1,8 @@
 language: python
+cache:
+  pip: true
+  directories:
+  - node_modules # NPM packages
 python:
   - "3.6"
 before_install:
