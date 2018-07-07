@@ -3,8 +3,8 @@
   "description": "Find a room at COS",
   "repository": "https://github.com/sloria/cosroom",
   "env": {
-    "SECRET_KEY": {"generator": "secret", "required": true},
-    "CLIENT_ID":  {
+    "SECRET_KEY": { "generator": "secret", "required": true },
+    "CLIENT_ID": {
       "description": "Google API client ID",
       "required": true
     },
@@ -18,8 +18,5 @@
       "required": true
     }
   },
-  "buildpacks": [
-    {"url": "heroku/python"},
-    {"url": "heroku/nodejs"}
-  ]
+  "buildpacks": [{ "url": "heroku/python" }, { "url": "heroku/nodejs" }]
 }

@@ -11,6 +11,7 @@ function parseJSON(response) {
 }
 
 export default function fetchJSON(...args) {
-  return fetch(...args).then(checkStatus).then(parseJSON);
+  return fetch(...args)
+    .then(checkStatus)
+    .then(parseJSON);
 }
-

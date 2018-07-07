@@ -1,4 +1,4 @@
-import { randomChoice } from './utils';
-test('randomChoice', () => {
-  expect(randomChoice(['foo', 'bar', 'baz'])).toBeTruthy();
+import { randomChoice } from "./utils";
+test("randomChoice", () => {
+  expect(randomChoice(["foo", "bar", "baz"])).toBeTruthy();
 });

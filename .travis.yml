@@ -1,8 +1,11 @@
-language: node_js
-node_js:
-- "8"
+language: python
+python:
+  - "3.6"
 before_install:
+- nvm install 8
 - npm install -g npm@5
 - npm install -g greenkeeper-lockfile@1
 before_script: greenkeeper-lockfile-update
+install: npm install
+script: npm test
 after_script: greenkeeper-lockfile-upload
