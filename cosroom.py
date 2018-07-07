@@ -1,4 +1,3 @@
-from email.utils import parseaddr
 import datetime as dt
 from collections import namedtuple
 
@@ -60,24 +59,16 @@ def get_room_calendars(calendar_list):
     ]
 
 
-# naive implementation, but fine for our purposes
-def is_email(s):
-    return s and bool(parseaddr(s)[1])
-
-
 def is_person_calendar(calendar):
     return (
         # it's not a room
         calendar.get("accessRole") == "reader"
         and
-        # its id is an email address
-        is_email(calendar.get("id"))
+        # its id is a COS email address
+        calendar.get("id").endswith("@cos.io")
         and
         # its not the COS calendar
         calendar.get("id") != "calendar@cos.io"
-        and
-        # not a shared event calendar
-        "group.calendar.google.com" not in calendar.get("id")
         and
         # its actively selected
         calendar.get("selected", False)
