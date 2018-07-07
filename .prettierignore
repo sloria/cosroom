@@ -1,0 +1,4 @@
+package.json
+package-lock.json
+# We're using jinja, so don't use prettier on HTML files
+*.html
