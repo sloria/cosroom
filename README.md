@@ -45,3 +45,14 @@ npm run dev
 ```
 
 Browse to http://localhost:5000 to view the app.
+
+If you need to use a Python debugger (e.g. ipdb), then run the web
+server and the webpack server separately
+
+```
+FLASK_APP=web/app.py FLASK_DEBUG=1 flask run
+```
+
+```
+npm run webpack-dev-server
+```
