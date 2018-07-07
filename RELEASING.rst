@@ -1,7 +1,5 @@
-*********
-Releasing
-*********
+# Releasing
 
-::
-
-  npm run deploy
+```
+npm run deploy
+```
