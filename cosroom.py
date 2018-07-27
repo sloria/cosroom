@@ -91,41 +91,55 @@ def get_next_weekday():
     return ret
 
 
+def to_datetime(event):
+    return maya.parse()
+
+
 def find_next_pairing_period(events):
-    hay_start, hay_end, needle_start, needle_end = None, None, None, None
-    for event in events:
-        print(f'event: {event["summary"]}')
-        summary_lower = event["summary"].lower()
-        if "available" in summary_lower and "pair" in summary_lower:
-            print(f"needle_start: {needle_start}")
-            print(f"needle_end: {needle_end}")
-            needle_start = maya.parse(event["start"]["dateTime"]).datetime()
-            needle_end = maya.parse(event["end"]["dateTime"]).datetime()
-
-            if hay_end and needle_start < hay_end:
-                print(f"updating needle_start to {hay_end.isoformat()}")
-                needle_start = hay_end
-            if hay_start and needle_end > hay_start:
-                if needle_end < hay_start:
-                    print(f"updating needle_end to {hay_start.isoformat()}")
-                    needle_end = hay_start
+    available, busy = [], []
+    for each in events:
+        if "available" in each["summary"].lower() and "pair" in each["summary"].lower():
+            available.append(each)
         else:
-            print(f"needle_start: {needle_start}")
-            print(f"needle_end: {needle_end}")
-            hay_start = maya.parse(event["start"]["dateTime"]).datetime()
-            print(f"hay_start: {hay_start}")
-            hay_end = maya.parse(event["end"]["dateTime"]).datetime()
-            print(f"hay_end: {hay_end}")
+            busy.append(each)
+    ret_start, ret_end = None, None
+    for av in available:
+        available_start, available_end = (
+            maya.parse(av["start"]["dateTime"]),
+            maya.parse(av["end"]["dateTime"]),
+        )
+        ret_start = available_start
+        ret_end = available_end
+        for bu in busy:
+            busy_start, busy_end = (
+                maya.parse(bu["start"]["dateTime"]),
+                maya.parse(bu["end"]["dateTime"]),
+            )
+            # starts before, ends before --nothing to do
+            if busy_start <= ret_start and busy_end <= ret_start:
+                continue
+            # starts after, ends after --nothing to do
+            if busy_start >= ret_end:
+                break
 
-            if needle_start and needle_start < hay_end:
-                if hay_start <= needle_start:
-                    print(f"updating needle_start to {hay_end.isoformat()}")
-                    needle_start = hay_end
-            if needle_end and needle_end > hay_start:
-                if hay_start > needle_end:
-                    print(f"updating needle_end to {hay_start.isoformat()}")
-                    needle_end = hay_start
-    return needle_start, needle_end
+            # starts before, ends after
+            if busy_start <= ret_start and busy_end >= ret_end:
+                # go to next available
+                break
+
+            # starts during, ends during
+            if busy_start > ret_start and busy_end < ret_end:
+                return ret_start, busy_start
+
+            # starts before, ends during
+            if busy_start <= ret_start and busy_end < ret_end:
+                ret_start = busy_end
+
+            # starts during, ends after
+            if busy_start > ret_start and busy_end >= ret_end:
+                return ret_start, busy_start
+
+    return ret_start, ret_end
 
 
 def get_pairing_events(service, calendar):

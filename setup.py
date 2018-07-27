@@ -4,6 +4,7 @@ from setuptools import setup
 REQUIREMENTS = [
     "environs>=1.2.0",
     "google-api-python-client>=1.6.3",
+    "oauth2client==4.1.2",
     "maya==0.3.2",
     # Web app requirements
     "flask==0.12.2",
