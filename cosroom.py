@@ -91,9 +91,48 @@ def get_next_weekday():
     return ret
 
 
+def find_next_pairing_period(events):
+    hay_start, hay_end, needle_start, needle_end = None, None, None, None
+    for event in events:
+        print(f'event: {event["summary"]}')
+        summary_lower = event["summary"].lower()
+        if "available" in summary_lower and "pair" in summary_lower:
+            print(f"needle_start: {needle_start}")
+            print(f"needle_end: {needle_end}")
+            needle_start = maya.parse(event["start"]["dateTime"]).datetime()
+            needle_end = maya.parse(event["end"]["dateTime"]).datetime()
+
+            if hay_end and needle_start < hay_end:
+                print(f"updating needle_start to {hay_end.isoformat()}")
+                needle_start = hay_end
+            if hay_start and needle_end > hay_start:
+                if needle_end < hay_start:
+                    print(f"updating needle_end to {hay_start.isoformat()}")
+                    needle_end = hay_start
+        else:
+            print(f"needle_start: {needle_start}")
+            print(f"needle_end: {needle_end}")
+            hay_start = maya.parse(event["start"]["dateTime"]).datetime()
+            print(f"hay_start: {hay_start}")
+            hay_end = maya.parse(event["end"]["dateTime"]).datetime()
+            print(f"hay_end: {hay_end}")
+
+            if needle_start and needle_start < hay_end:
+                if hay_start <= needle_start:
+                    print(f"updating needle_start to {hay_end.isoformat()}")
+                    needle_start = hay_end
+            if needle_end and needle_end > hay_start:
+                if hay_start > needle_end:
+                    print(f"updating needle_end to {hay_start.isoformat()}")
+                    needle_end = hay_start
+    return needle_start, needle_end
+
+
 def get_pairing_events(service, calendar):
     # Optimization: Only search for events during weekdays
     timemin = get_next_weekday()
+    # Optimization: Only search for events within a 24-hr period
+    timemax = timemin + dt.timedelta(hours=24)
     events = (
         service.events()
         .list(
@@ -101,11 +140,7 @@ def get_pairing_events(service, calendar):
             orderBy="startTime",
             singleEvents=True,
             timeMin=timemin.isoformat(),
-            maxResults=20,
-            # TODO: Add timeMax
-            # TODO: refine search?
-            # 'available pair' does not match "available for pairing"
-            q="available",
+            timeMax=timemax.isoformat(),
         )
         .execute()["items"]
     )

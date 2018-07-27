@@ -18,7 +18,7 @@ from flask_webpack import Webpack
 from flask_compress import Compress
 
 from apiclient.discovery import build
-from cosroom import get_free_and_busy_rooms
+from cosroom import get_free_and_busy_rooms, get_available_pairs
 from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
 
@@ -111,6 +111,15 @@ def api():
             "pairs": pairs,
         }
     )
+
+
+@app.route("/api/test/")
+def api_test():
+    service = get_service(error=True)
+    if not service or not check_service(service):
+        return redirect(url_for("login"))
+    calendars = get_available_pairs(service)
+    return jsonify(calendars)
 
 
 def check_service(service):
