@@ -4,7 +4,7 @@ from setuptools import setup
 REQUIREMENTS = [
     "environs>=1.2.0",
     "google-api-python-client>=1.6.3",
-    "maya==0.3.2",
+    "maya==0.5.0",
     # Web app requirements
     "flask==0.12.2",
     "flask-webpack==0.1.0",
