@@ -6,7 +6,7 @@ REQUIREMENTS = [
     "google-api-python-client>=1.6.3",
     "maya==0.5.0",
     # Web app requirements
-    "flask==0.12.2",
+    "flask==1.0.2",
     "flask-webpack==0.1.0",
     "flask-compress==1.4.0",
 ]
